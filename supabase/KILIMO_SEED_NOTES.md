@@ -1,4 +1,4 @@
-# Kilimo, Nitapata? — Supabase migration + seed notes
+# Nielekeze by TerraMavuno — Supabase migration + seed notes
 
 What this adds on top of the initial 21-table TerraMavuno schema
 (`migrations/20260902104652_initial_terramavuno_schema.sql`):
@@ -8,7 +8,7 @@ What this adds on top of the initial 21-table TerraMavuno schema
   - `public.farmer_tokens` — synthetic farmer tokens K-001…K-004. **No PII columns by design.**
   - `public.subsidy_prices` — gazetted price schedule (KES 2,500 subsidized / 6,500 market per 50 kg bag) with validity window.
   - RLS enabled on both new tables; `anon`/`authenticated` get SELECT only; all writes go through the service role.
-- `seed.sql` — the `-- === KILIMO, NITAPATA? seed ===` section (idempotent; fixed UUIDs, `on conflict` upserts, `not exists` guards). It seeds:
+- `seed.sql` — the `-- === Nielekeze by TerraMavuno seed ===` section (idempotent; fixed UUIDs, `on conflict` upserts, `not exists` guards). It seeds:
   - 5 `data_sources` (MoALD circular, Kenya Gazette notice, NCPB depot list, geoBoundaries KEN, TerraMavuno synthetic generator),
   - Murang'a county centroid + Kandara constituency (code 109) + its 6 wards (codes 0539–0544) with centroids,
   - the `ken-fert-subsidy-2026` programme with the full `ProgrammeRules` shape in `metadata`,

@@ -41,7 +41,7 @@ const CONCLUSION_LABEL: Record<Decision['conclusion'], string> = {
 export function formatDecisionForWhatsApp(decision: Decision): string {
   const lines: string[] = [];
 
-  lines.push(bold('TerraMavuno — Kilimo, Nitapata?'));
+  lines.push(bold('Nielekeze by TerraMavuno'));
   lines.push('');
   lines.push(`${bold(CONCLUSION_LABEL[decision.conclusion])}`);
 

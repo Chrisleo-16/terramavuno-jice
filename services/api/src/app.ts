@@ -3,7 +3,7 @@
  * the browser only ever receives data, SSE events and signed URLs.
  *
  * Two product surfaces share this server:
- *   • Kilimo, Nitapata? — the subsidy navigator behind the Cesium globe.
+ *   • Nielekeze by TerraMavuno — the subsidy navigator behind the Cesium globe.
  *   • Farmer channels   — the Africa's Talking USSD / SMS field channel.
  *
  * Routes

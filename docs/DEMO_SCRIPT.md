@@ -10,7 +10,7 @@ Presenter setup: `npm run dev:api` and `npm run dev` already running; browser at
 
 **Do:** App is already booted, slow orbit over the Indian Ocean approaching East Africa. If `GOOGLE_MAPS_API_KEY` is set, let the camera dip into photoreal Nairobi for ~5 seconds on the way (the optional photoreal beat); otherwise skip straight to Kenya at altitude.
 
-**Say:** *"This is TerraMavuno — Kilimo, Nitapata? 'Farming — will I get it?' Kenya subsidises fertilizer for registered smallholders, but the farmer's real question — will I get it, what will I pay, where do I go — is answered today by queueing at a depot and hoping. We answer it before the queue."*
+**Say:** *"This is Nielekeze by TerraMavuno — Swahili for 'direct me.' Kenya subsidises fertilizer for registered smallholders, but the farmer's real question — will I get it, what will I pay, where do I go — is answered today by queueing at a depot and hoping. We answer it before the queue."*
 
 ## Beat 1 — Murang'a wards draw (0:30–0:55)
 

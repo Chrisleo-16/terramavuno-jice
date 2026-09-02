@@ -1,5 +1,5 @@
 /**
- * Vite configuration for TerraMavuno "Kilimo, Nitapata?" — the globe app.
+ * Vite configuration for Nielekeze by TerraMavuno — the globe app.
  *
  * Slimmed from the God's Eye View config (MIT,
  * https://github.com/bilawalsidhu/gods-eye-view): all ~20 upstream API proxy

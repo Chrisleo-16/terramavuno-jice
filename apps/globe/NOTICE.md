@@ -6,7 +6,7 @@ The `apps/globe` workspace is a fork of the God's Eye View CesiumJS shell
 (Cesium bootstrap, map stack controller, world-overlay label system, style
 shaders, panel framework, camera verbs, scenes/annotations engines, and the
 glass visual identity in `style.css`), adapted for TerraMavuno's
-"Kilimo, Nitapata?" Kenya fertilizer-subsidy navigator.
+"Nielekeze by TerraMavuno" Kenya fertilizer-subsidy navigator.
 
 ## Third-party datasets
 

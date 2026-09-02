@@ -6,16 +6,22 @@ is given with the file that settles it.
 
 ---
 
-## Correction 0 — the product is not called Nielekeze
+## Correction 0 — the product name
 
-`Nielekeze` does not appear anywhere in this repository. The built product is:
+The product is:
 
-> **TerraMavuno — *Kilimo, Nitapata?*** ("Farming — will I get it?")
+> ***Nielekeze* by TerraMavuno** — `Nielekeze` is Swahili for *"direct me."*
 
-Package name `terramavuno` (`package.json:2`), used throughout the README, the API workspace
-`@terramavuno/api`, the shared library `@terramavuno/shared`, and the demo script. If the team
-has decided to rename, the rename has not been made in code and the submission would not match
-the repo a judge is shown.
+The rename landed in the working tree on 2026-09-02 and is applied across the UI title and
+subtitle, the chat panel header, the Claude and ElevenLabs system prompts, the share card, the
+README, the PRD and the demo script.
+
+`TerraMavuno` remains the **org/platform** name and the package namespace: `terramavuno`
+(`package.json:2`), the API workspace `@terramavuno/api`, and the shared library
+`@terramavuno/shared`. Internal identifiers that predate the rename — the `kilimo` module
+directories, the `kilimo-*` layer keys and the `/api` route handlers in
+`services/api/src/routes/kilimo.ts` — were deliberately **not** renamed: they are not
+farmer-visible, and churning them would carry migration risk for no submission benefit.
 
 The rest of this document keeps the draft's structure and rewrites each section to what exists.
 

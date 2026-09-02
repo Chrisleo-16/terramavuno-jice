@@ -119,7 +119,7 @@ In the chat loop, UI tools are emitted to the browser as SSE `client_action` eve
 
 ## Second surface — the farmer channel
 
-Kilimo, Nitapata? answers a farmer who can reach a browser or a voice agent. The farmer channel reaches the feature phone, and is the return path for community-classified ground truth. Both surfaces share `services/api`, `packages/shared` and the same Supabase provenance model.
+Nielekeze by TerraMavuno answers a farmer who can reach a browser or a voice agent. The farmer channel reaches the feature phone, and is the return path for community-classified ground truth. Both surfaces share `services/api`, `packages/shared` and the same Supabase provenance model.
 
 Browser (React/Vite)                     Feature phone / farmer channel
   ├─ Cesium globe / SVG 2D fallback        ├─ USSD menu session (stateful, no account)

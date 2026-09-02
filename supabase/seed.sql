@@ -67,7 +67,7 @@ insert into public.interventions(slug,name,category,description) values
 ('blended','Blended resilience portfolio','portfolio','Combined water, crop and extension package')
 on conflict(slug) do update set name=excluded.name;
 
--- === KILIMO, NITAPATA? seed ===
+-- === Nielekeze by TerraMavuno seed ===
 -- Fertilizer-subsidy navigator demo data. Idempotent: fixed UUIDs + on conflict
 -- upserts + not-exists guards. Requires migration 20260903000000_kilimo_subsidy.sql
 -- (farmer_tokens, subsidy_prices, programmes.slug).
@@ -222,7 +222,7 @@ on conflict(id) do update set area_id=excluded.area_id, claim=excluded.claim, va
 -- --- provenance: one 'seeded' event per entity group -------------------------
 insert into public.provenance_events(entity_table,entity_id,action,source_id,transformation,metadata)
 select v.entity_table, v.entity_id, 'seeded', '00000000-0000-0000-0000-000000000105',
-       'supabase/seed.sql — KILIMO, NITAPATA? section',
+       'supabase/seed.sql — Nielekeze by TerraMavuno section',
        '{"season":"2026 Long Rains","programme":"ken-fert-subsidy-2026"}'::jsonb
 from (values
   ('data_sources','kilimo:sources'),
@@ -237,4 +237,4 @@ where not exists (
   select 1 from public.provenance_events p
   where p.entity_table=v.entity_table and p.entity_id=v.entity_id and p.action='seeded'
 );
--- === end KILIMO, NITAPATA? seed ===
+-- === end Nielekeze by TerraMavuno seed ===

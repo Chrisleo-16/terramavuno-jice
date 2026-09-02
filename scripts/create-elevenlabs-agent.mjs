@@ -1,5 +1,5 @@
 /**
- * Creates (or updates) the "TerraMavuno — Kilimo, Nitapata?" ElevenLabs
+ * Creates (or updates) the "Nielekeze by TerraMavuno" ElevenLabs
  * Conversational AI agent, wired to the SAME 8 client tools the Claude chat
  * loop uses, so voice and text can never drift apart.
  *
@@ -62,7 +62,7 @@ const clientTools = shared.toElevenLabsClientTools();
 
 // The voice-tuned variant of the same honesty contract the chat loop uses.
 const VOICE_PROMPT = [
-  'You are the voice of TerraMavuno "Kilimo, Nitapata?", a Kenyan fertilizer-subsidy navigator.',
+  'You are the voice of Nielekeze by TerraMavuno, a Kenyan fertilizer-subsidy navigator.',
   '',
   'THE ENGINE DECIDES, YOU EXPLAIN.',
   'Never work out eligibility yourself. Always call evaluate_farmer and restate the Decision it returns.',
@@ -90,7 +90,7 @@ const FIRST_MESSAGE =
   'and tell you what the rules say, what you would pay, and where to go.';
 
 const payload = {
-  name: 'TerraMavuno — Kilimo, Nitapata?',
+  name: 'Nielekeze by TerraMavuno',
   conversation_config: {
     agent: {
       prompt: {

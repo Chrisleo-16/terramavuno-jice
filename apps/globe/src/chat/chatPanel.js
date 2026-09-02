@@ -58,7 +58,7 @@ export function mountChatPanel({ chatClient, showResultCard } = {}) {
 
   mount.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--glass-border);flex:none;">
-      <span style="font-size:10px;letter-spacing:0.22em;color:var(--accent);">KILIMO, NITAPATA?</span>
+      <span style="font-size:10px;letter-spacing:0.22em;color:var(--accent);">Nielekeze by TerraMavuno</span>
       <span data-chat="state" role="status" aria-live="polite" style="margin-left:auto;font-size:9px;letter-spacing:0.14em;color:var(--text-dim);"></span>
     </div>
 
@@ -72,7 +72,7 @@ export function mountChatPanel({ chatClient, showResultCard } = {}) {
     <div style="padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px;flex:none;" data-chat="suggestions"></div>
 
     <form data-chat="form" style="display:flex;gap:8px;align-items:flex-end;padding:10px 14px 12px;border-top:1px solid var(--glass-border);flex:none;">
-      <label for="kilimo-chat-input" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Ask the Kilimo assistant</label>
+      <label for="kilimo-chat-input" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Ask the Nielekeze assistant</label>
       <textarea id="kilimo-chat-input" data-chat="input" rows="1" placeholder="Uliza… e.g. Nina mbolea ya ruzuku?"
         style="flex:1;resize:none;max-height:88px;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:10px;padding:8px 10px;color:var(--text-primary);font-family:var(--font-mono);font-size:12px;"></textarea>
       <button type="submit" data-chat="send"

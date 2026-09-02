@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌍 TerraMavuno — *Kilimo, Nitapata?*
+# 🌍 *Nielekeze* by TerraMavuno
 
 ### **Know before you queue.**
 
@@ -14,7 +14,7 @@ and gets a cited, deterministic answer on a cinematic 3D globe — before spendi
 [![licence](https://img.shields.io/badge/code-MIT-6be8ff?style=flat-square)](LICENSE)
 [![data](https://img.shields.io/badge/data-mixed_licences-f5b942?style=flat-square)](docs/DATA_SOURCES.md)
 
-![TerraMavuno: Kilimo, Nitapata? — the globe over Murang'a with the Kandara ward boundaries and the Kilimo chat panel](docs/media/kilimo-globe.png)
+![Nielekeze by TerraMavuno — the globe over Murang'a with the Kandara ward boundaries and the Nielekeze chat panel](docs/media/kilimo-globe.png)
 
 <sub>Captured **keyless** (no API keys) on Esri World Imagery via `node scripts/verify-globe-boot.mjs`.<br/>With a Google Map Tiles or Cesium ion key, the basemap upgrades to photorealistic 3D.</sub>
 
@@ -43,7 +43,7 @@ and gets a cited, deterministic answer on a cinematic 3D globe — before spendi
 
 Kenya publishes the rules. It publishes the prices. It publishes the depots. **The information exists — it is just not answerable from where the farmer is standing.**
 
-`Kilimo, Nitapata?` is Swahili for *"Farming — will I get it?"* That is the entire product question.
+`Nielekeze` is Swahili for *"direct me"* — *show me the way.* That is the entire product question: will I get it, what will I pay, and where do I go?
 
 <table>
 <tr><th align="left" width="50%">❌ What this is not</th><th align="left" width="50%">✅ What this is</th></tr>
@@ -711,7 +711,7 @@ Endpoints live under `/channels/*` and `POST /api/field-reports`. See
 <div align="center">
 
 **TerraMavuno** is Kenya's spatial evidence layer for agricultural public services.
-**Kilimo, Nitapata?** is its first product — telling a registered farmer what the published rules indicate they can receive,
+**Nielekeze by TerraMavuno** is its first product — telling a registered farmer what the published rules indicate they can receive,
 what they still lack, what the documented price is, where to go —
 **and when the evidence cannot confirm an answer.**
 

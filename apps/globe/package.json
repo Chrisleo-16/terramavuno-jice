@@ -2,7 +2,7 @@
   "name": "@terramavuno/globe",
   "private": true,
   "version": "0.1.0",
-  "description": "TerraMavuno \u2014 Kilimo, Nitapata? Kenya fertilizer-subsidy navigator on a cinematic CesiumJS globe (forked from God's Eye View, MIT).",
+  "description": "TerraMavuno \u2014 Nielekeze by TerraMavuno Kenya fertilizer-subsidy navigator on a cinematic CesiumJS globe (forked from God's Eye View, MIT).",
   "type": "module",
   "license": "MIT",
   "scripts": {

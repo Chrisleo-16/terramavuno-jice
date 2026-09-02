@@ -1,5 +1,5 @@
 /**
- * TERRAMAVUNO — "Kilimo, Nitapata?" — Main Entry Point.
+ * TERRAMAVUNO — "Nielekeze by TerraMavuno" — Main Entry Point.
  *
  * Forked from God's Eye View (MIT,
  * https://github.com/bilawalsidhu/gods-eye-view): CesiumJS bootstrap with

@@ -50,7 +50,7 @@ export function flyToPreset(viewer, presetName, duration = 3.0) {
 /**
  * Default startup flight: orbit in from high above Kenya, then settle over
  * Murang'a county / the Kandara area (lat -0.85, lon 36.95) — the heart of
- * the "Kilimo, Nitapata?" farmer journey.
+ * the "Nielekeze by TerraMavuno" farmer journey.
  */
 export function flyToKenya(viewer) {
   // Start from a high altitude over Kenya, looking straight down

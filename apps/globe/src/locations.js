@@ -6,7 +6,7 @@ import { viewportBias, placesNearViewRecovery } from './annotations/annotationRe
  *
  * God's Eye View shipped eight world-city presets (Austin, SF, NYC, Tokyo,
  * London, Paris, Dubai, DC); this fork replaces them with the three places the
- * "Kilimo, Nitapata?" demo actually visits. Kandara's POIs are the SIX
+ * "Nielekeze by TerraMavuno" demo actually visits. Kandara's POIs are the SIX
  * Kandara-constituency wards, and their coordinates are the calculated ward
  * centroids from `src/data/local_data/kenya/centroids.json` (derived from
  * IEBC/HDX ward boundaries) so the camera, the ward polygons, and the

@@ -96,7 +96,7 @@ export function decisionIsSimulated(decision) {
 export function decisionToText(decision) {
   const meta = CONCLUSION_META[decision?.conclusion] ?? { label: decision?.conclusion ?? 'unknown' };
   const lines = [
-    'TERRAMAVUNO — Kilimo, Nitapata?',
+    'Nielekeze by TerraMavuno',
     `Farmer ${decision?.farmerToken ?? '—'} · ${decision?.wardName ?? '—'} ward, Kandara, Murang'a`,
     `Conclusion: ${meta.label}`,
     `Eligible: ${decision?.eligible === true ? 'YES' : decision?.eligible === false ? 'NO' : 'cannot determine'}`,

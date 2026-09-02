@@ -2,7 +2,7 @@
   "name": "terramavuno",
   "version": "0.1.0",
   "private": true,
-  "description": "TerraMavuno: Kilimo, Nitapata? \u2014 Kenya's spatial evidence layer for agricultural public services",
+  "description": "Nielekeze by TerraMavuno \u2014 Kenya's spatial evidence layer for agricultural public services",
   "workspaces": [
     "apps/*",
     "services/*",

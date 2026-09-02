@@ -1,5 +1,5 @@
 -- ============================================================================
--- KILIMO, NITAPATA? — fertilizer-subsidy navigator persistence
+-- Nielekeze by TerraMavuno — fertilizer-subsidy navigator persistence
 -- ============================================================================
 -- Adds ONLY what the initial 21-table TerraMavuno schema
 -- (20260902104652_initial_terramavuno_schema.sql) lacks:
@@ -46,7 +46,7 @@ create table public.farmer_tokens (
 );
 
 comment on table public.farmer_tokens is
-  'Synthetic farmer tokens for the Kilimo, Nitapata? demo. CONTAINS NO PII: no names, phone numbers or national ID values — only opaque token codes (K-001…) and boolean/unknown flags. classification defaults to simulated; every consumer must surface that label. The deterministic engine (not Claude) evaluates these rows against programmes.metadata rules.';
+  'Synthetic farmer tokens for the Nielekeze by TerraMavuno demo. CONTAINS NO PII: no names, phone numbers or national ID values — only opaque token codes (K-001…) and boolean/unknown flags. classification defaults to simulated; every consumer must surface that label. The deterministic engine (not Claude) evaluates these rows against programmes.metadata rules.';
 comment on column public.farmer_tokens.token_code is
   'Opaque synthetic token (e.g. K-001). The only identifier a farmer presents; never maps to a real person.';
 comment on column public.farmer_tokens.ward_area_id is

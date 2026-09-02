@@ -1,5 +1,5 @@
 /**
- * Scene recipes for TerraMavuno — "Kilimo, Nitapata?".
+ * Scene recipes for Nielekeze by TerraMavuno.
  *
  * Replaces the God's Eye View recipes (Global Flights Radar, Orbital Watch,
  * Thermal Threat Board, City Overload, Omniscience Pullback), every one of

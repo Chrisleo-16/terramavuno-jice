@@ -7,7 +7,7 @@ Verified against the working tree on 2026-09-02. Each block below maps to one fo
 ## Project name *
 
 ```
-TerraMavuno — Kilimo, Nitapata?
+Nielekeze by TerraMavuno
 ```
 
 ---
