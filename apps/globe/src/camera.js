@@ -32,14 +32,20 @@ export const CAMERA_PRESETS = {
    * the scope mask cropped what was left, and it was genuinely hard to tell
    * you were looking at Kenya.
    *
-   * 2,200,000 m was picked by screenshotting a sweep (1,400 / 1,800 / 2,200 /
-   * 2,800 km), not by arithmetic alone: at 2,200 km the whole country sits
-   * inside the scope mask with Lake Victoria, Lake Turkana and the coast for
-   * context. 2,800 km was too far for the tile pyramid — imagery and the
-   * clamped county outlines both dropped out, leaving a featureless disc.
+   * 2,600,000 m was picked by screenshotting a sweep (1,400 / 1,800 / 2,200 /
+   * 2,600 / 3,000 km) with a wait for `tilesLoaded` on each, not by arithmetic
+   * alone. At 2,600 km the whole country sits inside the scope mask with clear
+   * margin and Lake Victoria, Lake Turkana and the coast for context. 2,200 km
+   * still crowded the edges; by 3,000 km Kenya is small enough that the chat
+   * panel starts eating the south-east.
+   *
+   * An earlier pass rejected 2,800 km as "too far for the tile pyramid" — that
+   * was wrong. The disc was blank because the screenshot was taken before the
+   * tiles had loaded, not because of the altitude. Waiting on `tilesLoaded`
+   * before judging is what settled it.
    */
   kenya: {
-    destination: Cesium.Cartesian3.fromDegrees(37.9, 0.4, 2200000),
+    destination: Cesium.Cartesian3.fromDegrees(37.9, 0.4, 2600000),
     orientation: {
       heading: Cesium.Math.toRadians(0),
       pitch: Cesium.Math.toRadians(-90),
@@ -179,7 +185,7 @@ export function flyToKenya(viewer, options = {}) {
 
   // Beat 1 — out in space, looking straight down at Kenya.
   viewer.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(37.9, 0.4, 4200000),
+    destination: Cesium.Cartesian3.fromDegrees(37.9, 0.4, 5200000),
     orientation: {
       heading: Cesium.Math.toRadians(0),
       pitch: Cesium.Math.toRadians(-90),

@@ -61,6 +61,7 @@ import {
 } from './kilimoData.js';
 import { createWardLayer, normalizePlace } from './wardLayer.js';
 import { createCountiesLayer } from './countiesLayer.js';
+import { installOverlayZoomGate } from './overlayZoomGate.js';
 import { createDepotLayer } from './depotLayer.js';
 import { createProgrammeLayer } from './programmeLayer.js';
 import { createPriceLayer } from './priceLayer.js';
@@ -88,7 +89,7 @@ export const LAYERS_READY_EVENT = 'kilimo:layers-ready';
 const TARGET_ALTITUDES = Object.freeze({
   // Matches the startup flight's framings (see camera.js). "Fly to Kenya" from
   // chat or voice must land on the same recognisable view as the opening shot.
-  country: 2200000,
+  country: 2600000,
   county: 150000,
   constituency: 20000,
   ward: 7000,
@@ -232,7 +233,7 @@ export function listResolvableTargets() {
  * @param {string[]} [options.initialVisible] Layer ids to switch on
  *   immediately. Defaults to the wards layer, which is what the opening scene
  *   expects to see.
- * @returns {{layers: object[], resolveTarget: typeof resolveTarget, focusTarget: function(*):boolean}}
+ * @returns {{layers: object[], resolveTarget: typeof resolveTarget, focusTarget: function(*):boolean, overlayZoomGate: object}}
  */
 export function registerKilimoLayers({
   viewer,
@@ -349,11 +350,15 @@ export function registerKilimoLayers({
     void setLayerEnabled(layerId, true);
   }
 
+  // Hide ward/depot/farmer/price cards once the camera is too far out for them
+  // to mean anything. Boundaries stay; only the text goes.
+  const overlayZoomGate = installOverlayZoomGate({ viewer });
+
   window.dispatchEvent(new CustomEvent(LAYERS_READY_EVENT, {
     detail: { layerIds: layers.map((layer) => layer.id) },
   }));
 
-  return { layers, resolveTarget, focusTarget };
+  return { layers, resolveTarget, focusTarget, overlayZoomGate };
 }
 
 /**
