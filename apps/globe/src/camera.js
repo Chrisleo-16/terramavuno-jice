@@ -48,12 +48,81 @@ export function flyToPreset(viewer, presetName, duration = 3.0) {
 }
 
 /**
- * Default startup flight: orbit in from high above Kenya, then settle over
- * Murang'a county / the Kandara area (lat -0.85, lon 36.95) — the heart of
- * the "Nielekeze by TerraMavuno" farmer journey.
+ * Kenya-wide framing: the whole country top-down, used as the opening rest
+ * point of the startup flight so the farmer sees the national picture before
+ * the camera commits to one county.
  */
-export function flyToKenya(viewer) {
-  // Start from a high altitude over Kenya, looking straight down
+export const KENYA_OVERVIEW = CAMERA_PRESETS.kenya;
+
+/** How long the camera holds on the Kenya-wide view before drilling in (ms). */
+export const KENYA_HOLD_MS = 3500;
+
+/**
+ * Default startup flight, in three beats:
+ *
+ *   1. Snap to a vantage point out in space, straight down over Kenya.
+ *   2. Fly in and SETTLE on the whole of Kenya — held for KENYA_HOLD_MS so the
+ *      national layer is actually readable, not a frame smeared through on the
+ *      way somewhere else.
+ *   3. Only then descend to Murang'a county / the Kandara area (lat -0.85,
+ *      lon 36.95) — the heart of the "Nielekeze by TerraMavuno" farmer journey.
+ *
+ * The descent is abandoned if the user grabs the camera first: an opening
+ * animation should never fight someone who has started exploring. Cancelling
+ * leaves the camera wherever it currently is.
+ *
+ * @param {object} viewer Cesium viewer.
+ * @param {{onStage?: (stage: 'kenya'|'muranga') => void, holdMs?: number,
+ *          drillDown?: boolean}} [options]
+ *   onStage   - notified as each beat BEGINS (useful for loader copy).
+ *   holdMs    - override the Kenya-wide dwell.
+ *   drillDown - set false to stop at the Kenya-wide view.
+ * @returns {{cancel: () => void, done: Promise<'kenya'|'muranga'>}}
+ *   `done` resolves with the last stage actually reached.
+ */
+export function flyToKenya(viewer, options = {}) {
+  const { onStage, holdMs = KENYA_HOLD_MS, drillDown = true } = options;
+
+  let cancelled = false;
+  let holdTimer = null;
+  let resolveDone;
+  const done = new Promise((resolve) => {
+    resolveDone = resolve;
+  });
+
+  const stage = (name) => {
+    try {
+      onStage?.(name);
+    } catch {
+      // A caller's status-copy handler must never break the flight.
+    }
+  };
+
+  const cancel = () => {
+    if (cancelled) return;
+    cancelled = true;
+    if (holdTimer !== null) clearTimeout(holdTimer);
+    holdTimer = null;
+    detachUserOverride();
+    viewer.camera.cancelFlight();
+    resolveDone('kenya');
+  };
+
+  // Any real camera input from the user retires the scripted flight.
+  const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+  const overrideTypes = [
+    Cesium.ScreenSpaceEventType.LEFT_DOWN,
+    Cesium.ScreenSpaceEventType.RIGHT_DOWN,
+    Cesium.ScreenSpaceEventType.MIDDLE_DOWN,
+    Cesium.ScreenSpaceEventType.WHEEL,
+    Cesium.ScreenSpaceEventType.PINCH_START,
+  ];
+  function detachUserOverride() {
+    if (!handler.isDestroyed()) handler.destroy();
+  }
+  for (const type of overrideTypes) handler.setInputAction(() => cancel(), type);
+
+  // Beat 1 — out in space, looking straight down at Kenya.
   viewer.camera.setView({
     destination: Cesium.Cartesian3.fromDegrees(37.9, 0.2, 2500000),
     orientation: {
@@ -63,17 +132,46 @@ export function flyToKenya(viewer) {
     },
   });
 
-  // Cinematic fly-in to the Kandara area of Murang'a after a brief pause
-  setTimeout(() => {
-    viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(36.95, -0.85, 30000),
-      orientation: {
-        heading: Cesium.Math.toRadians(10),
-        pitch: Cesium.Math.toRadians(-45),
-        roll: 0.0,
-      },
-      duration: 4.5,
-      easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
-    });
-  }, 500);
+  // Beat 2 — settle on the whole country.
+  stage('kenya');
+  viewer.camera.flyTo({
+    destination: KENYA_OVERVIEW.destination,
+    orientation: KENYA_OVERVIEW.orientation,
+    duration: 3.0,
+    easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
+    complete: () => {
+      if (cancelled) return;
+      if (!drillDown) {
+        detachUserOverride();
+        resolveDone('kenya');
+        return;
+      }
+
+      // Beat 3 — hold on Kenya, then descend to Murang'a.
+      holdTimer = setTimeout(() => {
+        holdTimer = null;
+        if (cancelled) return;
+        stage('muranga');
+        viewer.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(36.95, -0.85, 30000),
+          orientation: {
+            heading: Cesium.Math.toRadians(10),
+            pitch: Cesium.Math.toRadians(-45),
+            roll: 0.0,
+          },
+          duration: 4.5,
+          easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
+          complete: () => {
+            if (cancelled) return;
+            detachUserOverride();
+            resolveDone('muranga');
+          },
+          cancel: () => cancel(),
+        });
+      }, holdMs);
+    },
+    cancel: () => cancel(),
+  });
+
+  return { cancel, done };
 }

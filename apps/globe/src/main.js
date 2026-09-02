@@ -235,9 +235,16 @@ async function init() {
     // Style manager: post-processing, HUD, panels, map-stack chips, locations.
     const styleManager = new StyleManager(viewer, { mapStackController });
 
-    // Default flight: orbit in over Kenya, settle above Murang'a / Kandara.
-    loaderStatus.textContent = "Flying to Murang'a, Kenya...";
-    flyToKenya(viewer);
+    // Default flight: settle on the whole of Kenya, hold, then descend to
+    // Murang'a / Kandara. Cancels itself if the user takes the camera first.
+    loaderStatus.textContent = 'Framing Kenya...';
+    const startupFlight = flyToKenya(viewer, {
+      onStage: (stage) => {
+        loaderStatus.textContent =
+          stage === 'kenya' ? 'Framing Kenya...' : "Flying to Murang'a, Kenya...";
+      },
+    });
+    window.__KILIMO_STARTUP_FLIGHT__ = startupFlight;
 
     // Data layer manager. The Kenya layers register through
     // window.__KILIMO__.registerLayer AFTER boot, so registrations are

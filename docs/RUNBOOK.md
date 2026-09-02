@@ -49,6 +49,21 @@ npm run typecheck                              # all workspaces
 npm run build                                  # production build
 ```
 
+### Live smoke test (against a running stack)
+
+With both terminals up, this exercises every surface end to end — health, the
+five data endpoints, all five farmer verdicts, USSD/SMS, opt-out, field
+reports, chat and voice — and exits non-zero if anything a demo depends on is
+broken:
+
+```powershell
+npm run test:live          # API + channels + engine
+npm run test:live:globe    # the above, plus a headless browser boot
+```
+
+For the browser steps a script cannot see (the opening flight, layer toggles,
+result cards), walk **docs/LIVE_TEST_CHECKLIST.md**.
+
 ## Supabase (optional — the demo runs on bundled JSON without it)
 
 Hosted project (requires the project ref and a database password):
