@@ -60,11 +60,15 @@ export function createChannelRouter(deps: ChannelDeps = {}): Router {
   /** Send a body as one or more SMS parts. Never throws into a webhook handler. */
   async function reply(msisdn: string, body: string): Promise<void> {
     try {
-      for (const part of segmentSms(body).parts) {
-        const result = await dispatch([msisdn], part);
+      const {parts, encoding, segments} = segmentSms(body);
+      for (const part of parts) {
+        const result = (await dispatch([msisdn], part)) as
+          {skippedReason?: string; providerMessage?: string; recipients?: {status: string; statusCode: number; cost: string}[]} | undefined;
         // Surface a no-op send: without this an unconfigured provider looks identical to success.
-        const skipped = (result as {skippedReason?: string} | undefined)?.skippedReason;
-        if (skipped) console.warn(`[channels] outbound SMS not sent: ${skipped}`);
+        if (result?.skippedReason) { console.warn(`[channels] outbound SMS not sent: ${result.skippedReason}`); continue; }
+        // Status and cost only — never the recipient number.
+        const outcome = result?.recipients?.map(r => `${r.status}(${r.statusCode}) ${r.cost}`).join('; ');
+        console.log(`[channels] outbound SMS ${encoding} ${segments} segment(s)${outcome ? `: ${outcome}` : result?.providerMessage ? `: ${result.providerMessage}` : ''}`);
       }
     } catch (err) {
       // Deliberately does not log the MSISDN.

@@ -5,45 +5,63 @@
  * browser. `/health` and the per-integration health routes report BOOLEANS
  * only (configured / not configured), never key values or lengths.
  *
- * The repo has a SINGLE root .env (apps/globe reads it via Vite's envDir; we
- * read it via dotenv). The path is resolved from import.meta.url so it works
- * from src/ under tsx AND from dist/ under node.
+ * The repo has a SINGLE root env file (apps/globe reads it via Vite's envDir;
+ * we walk up to it from wherever the process was started). `.env.local` is
+ * read before `.env` so the more specific file wins, and an already-set
+ * process env ALWAYS wins over both, so injected production config is never
+ * overridden by a stray local file.
+ *
+ * Deliberately dependency-free: this runs before anything else and should not
+ * pull a package in just to split on "=".
+ *
+ * `server.ts` imports `loadEnv()` and calls it FIRST, ahead of app.js, which
+ * reads configuration at import time.
  */
-import { existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import dotenv from 'dotenv';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 
-/** Directory of this module (ESM-safe; __dirname does not exist here). */
-const here = dirname(fileURLToPath(import.meta.url));
-
-/**
- * Walk up from this file looking for the repo-root .env. Depth 4 covers both
- * services/api/src/env.ts and services/api/dist/env.js layouts, plus a little
- * slack for future nesting.
- */
-export function findRootEnvFile(startDir: string = here): string | null {
-  let dir = startDir;
-  for (let i = 0; i < 6; i += 1) {
-    const candidate = resolve(dir, '.env');
+function findUpwards(fileName: string, from: string): string | null {
+  let dir = resolve(from);
+  for (;;) {
+    const candidate = join(dir, fileName);
     if (existsSync(candidate)) return candidate;
     const parent = dirname(dir);
-    if (parent === dir) break;
+    if (parent === dir) return null;
     dir = parent;
   }
-  return null;
 }
 
-let loaded = false;
-
-/** Load the root .env exactly once. Existing process env always wins. */
-export function loadEnv(): void {
-  if (loaded) return;
-  loaded = true;
-  const file = findRootEnvFile();
-  if (file) dotenv.config({ path: file });
+function apply(path: string): void {
+  for (const rawLine of readFileSync(path, 'utf8').split('\n')) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+    const key = line.slice(0, eq).trim();
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) || process.env[key] !== undefined) continue;
+    process.env[key] = line
+      .slice(eq + 1)
+      .trim()
+      .replace(/^["']|["']$/g, '');
+  }
 }
 
+/** Load root env files. Returns the paths actually read, for the boot log. */
+export function loadEnv(from: string = process.cwd()): string[] {
+  const loaded: string[] = [];
+  // `.env.local` first: when both define a key, the more specific file wins.
+  for (const name of ['.env.local', '.env']) {
+    const path = findUpwards(name, from);
+    if (path) {
+      apply(path);
+      loaded.push(path);
+    }
+  }
+  return loaded;
+}
+
+// Load on import too, so a module that reads `env.*` without going through
+// server.ts (tests, scripts) still sees the root file.
 loadEnv();
 
 const val = (name: string): string | undefined => {
