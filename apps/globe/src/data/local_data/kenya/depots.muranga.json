@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-09-02T00:00:00Z",
+  "note": "Fertilizer collection points for the Murang'a / Kandara demo. Exactly ONE depot is a real, cited NCPB facility; the other three are SYNTHETIC agro-dealer stand-ins (classification: simulated) placed in real Kandara-area market towns. Stock statuses are demo values, never live data. Records mirror packages/shared/src/data/kilimo-fallback.json and are engine-compatible (eligibility Depot shape plus town/county display extras).",
+  "depots": [
+    {
+      "id": "ncpb-sagana",
+      "name": "NCPB Sagana Depot",
+      "lat": -0.66,
+      "lon": 37.2,
+      "merchant": "National Cereals and Produce Board",
+      "assetType": "ncpb_depot",
+      "town": "Sagana",
+      "county": "Kirinyaga",
+      "stockStatus": "in_stock",
+      "checkedAt": "2026-09-02T06:00:00Z",
+      "classification": "official",
+      "evidence": {
+        "authority": "official",
+        "derivation": "direct",
+        "freshness": { "checkedAt": "2026-09-02T06:00:00Z", "status": "current" },
+        "sourceId": "ncpb-depot-register",
+        "citation": "NCPB depot register — Sagana Depot stock report, checked 2026-09-02 06:00 UTC"
+      }
+    },
+    {
+      "id": "kabati-agrovet",
+      "name": "Kabati Agrovet",
+      "lat": -0.9,
+      "lon": 36.98,
+      "merchant": "Kabati Agrovet Ltd (SIMULATED)",
+      "assetType": "agro_dealer",
+      "town": "Kabati",
+      "county": "Murang'a",
+      "stockStatus": "unknown",
+      "checkedAt": null,
+      "classification": "simulated",
+      "evidence": {
+        "authority": "reported",
+        "derivation": "simulated",
+        "freshness": { "checkedAt": null, "status": "unknown" },
+        "sourceId": "simulated-depot-kabati",
+        "citation": "SIMULATED agro-dealer for demo — Kabati Agrovet; no verified stock feed"
+      }
+    },
+    {
+      "id": "kagunduini-supplies",
+      "name": "Kagundu-ini Farm Supplies",
+      "lat": -0.93,
+      "lon": 36.94,
+      "merchant": "Kagundu-ini Farm Supplies (SIMULATED)",
+      "assetType": "agro_dealer",
+      "town": "Kagundu-ini",
+      "county": "Murang'a",
+      "stockStatus": "low",
+      "checkedAt": "2026-09-01T14:00:00Z",
+      "classification": "simulated",
+      "evidence": {
+        "authority": "reported",
+        "derivation": "simulated",
+        "freshness": { "checkedAt": "2026-09-01T14:00:00Z", "status": "current" },
+        "sourceId": "simulated-depot-kagunduini",
+        "citation": "SIMULATED agro-dealer for demo — Kagundu-ini Farm Supplies; stock self-reported 2026-09-01 14:00 UTC"
+      }
+    },
+    {
+      "id": "kenol-agro",
+      "name": "Kenol Agro Centre",
+      "lat": -0.99,
+      "lon": 37.12,
+      "merchant": "Kenol Agro Centre (SIMULATED)",
+      "assetType": "agro_dealer",
+      "town": "Kenol",
+      "county": "Murang'a",
+      "stockStatus": "in_stock",
+      "checkedAt": "2026-09-02T05:30:00Z",
+      "classification": "simulated",
+      "evidence": {
+        "authority": "reported",
+        "derivation": "simulated",
+        "freshness": { "checkedAt": "2026-09-02T05:30:00Z", "status": "current" },
+        "sourceId": "simulated-depot-kenol",
+        "citation": "SIMULATED agro-dealer for demo — Kenol Agro Centre; stock self-reported 2026-09-02 05:30 UTC"
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+/* ------------------------------------------------------------------ */
+/* Convenience views + lookups                                          */
+/* ------------------------------------------------------------------ */
+
+export const KILIMO_PROGRAMME: FallbackProgramme = KILIMO_FALLBACK.programme;
+export const KILIMO_PRICES: PriceRow[] = KILIMO_FALLBACK.prices;
+export const KILIMO_DEPOTS: FallbackDepot[] = KILIMO_FALLBACK.depots;
+export const KILIMO_FARMERS: FallbackFarmer[] = KILIMO_FALLBACK.farmers;
+export const KILIMO_WARDS: WardRecord[] = KILIMO_FALLBACK.wards;
+export const KILIMO_SOURCES: SourceRecord[] = KILIMO_FALLBACK.sources;
+
+/** The six Kandara constituency wards (kenya-locations codes 0539-0544). */
+export const KANDARA_WARD_CODES: string[] = KILIMO_FALLBACK.programme.participatingWardCodes;
+
+export function getFarmerByToken(token: string): FallbackFarmer | undefined {
+  const t = token.trim().toUpperCase();
+  return KILIMO_FALLBACK.farmers.find((f) => f.token.toUpperCase() === t);
+}
+
+export function getDepotById(id: string): FallbackDepot | undefined {
+  return KILIMO_FALLBACK.depots.find((d) => d.id === id);
+}
+
+export function getWardByCode(codeOrName: string): WardRecord | undefined {
+  const norm = (s: string) => s.toLowerCase().replace(/[’'`´\-\s]/g, '');
+  return KILIMO_FALLBACK.wards.find(
+    (w) => w.code === codeOrName || norm(w.name) === norm(codeOrName),
+  );
+}
+
+export function getSourceById(id: string): SourceRecord | undefined {
+  return KILIMO_FALLBACK.sources.find((s) => s.id === id);
+}

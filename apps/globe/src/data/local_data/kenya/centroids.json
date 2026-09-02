@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-09-02T12:09:28.655Z",
+  "note": "Centroids of the largest polygon ring per area; for labels/camera only, not authoritative.",
+  "wards": [
+    {
+      "code": "0539",
+      "name": "Ng'araria",
+      "constituency": "Kandara",
+      "county": "Murang'a",
+      "lat": -0.93588,
+      "lon": 37.02661,
+      "derivation": "calculated"
+    },
+    {
+      "code": "0540",
+      "name": "Muruka",
+      "constituency": "Kandara",
+      "county": "Murang'a",
+      "lat": -0.92609,
+      "lon": 37.05547,
+      "derivation": "calculated"
+    },
+    {
+      "code": "0541",
+      "name": "Kagundu-ini",
+      "constituency": "Kandara",
+      "county": "Murang'a",
+      "lat": -0.90542,
+      "lon": 37.0706,
+      "derivation": "calculated"
+    },
+    {
+      "code": "0542",
+      "name": "Gaichanjiru",
+      "constituency": "Kandara",
+      "county": "Murang'a",
+      "lat": -0.87136,
+      "lon": 37.04936,
+      "derivation": "calculated"
+    },
+    {
+      "code": "0543",
+      "name": "Ithiru",
+      "constituency": "Kandara",
+      "county": "Murang'a",
+      "lat": -0.88043,
+      "lon": 36.98795,
+      "derivation": "calculated"
+    },
+    {
+      "code": "0544",
+      "name": "Ruchu",
+      "constituency": "Kandara",
+      "county": "Murang'a",
+      "lat": -0.83148,
+      "lon": 36.92132,
+      "derivation": "calculated"
+    }
+  ],
+  "counties": [
+    {
+      "code": "021",
+      "name": "Murang'a",
+      "lat": -0.80716,
+      "lon": 37.02909,
+      "derivation": "calculated"
+    }
+  ]
+}
