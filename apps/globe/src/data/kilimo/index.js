@@ -86,8 +86,10 @@ export const LAYERS_READY_EVENT = 'kilimo:layers-ready';
 
 /** Default camera altitudes per target kind, in metres. */
 const TARGET_ALTITUDES = Object.freeze({
-  country: 1500000,
-  county: 62000,
+  // Matches the startup flight's framings (see camera.js). "Fly to Kenya" from
+  // chat or voice must land on the same recognisable view as the opening shot.
+  country: 2200000,
+  county: 150000,
   constituency: 20000,
   ward: 7000,
   depot: 4500,
