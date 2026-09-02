@@ -51,7 +51,11 @@ on conflict(level,slug) do update set code=excluded.code, source_id=excluded.sou
 
 insert into public.data_sources(id,name,publisher,url,license,classification,attribution,terms_checked_at) values
 ('00000000-0000-0000-0000-000000000001','TerraMavuno demo benchmark','TerraMavuno','https://github.com/Chrisleo-16/claude-nairobi-impact-jice','Project documentation only','simulated','Synthetic values for interface demonstration; not official evidence.',now()),
-('00000000-0000-0000-0000-000000000002','Kenya Locations','David Amunga','https://github.com/davidamunga/kenya-locations','MIT','research','County names and codes from Kenya Locations; Copyright (c) 2025 David Amunga.',now())
+('00000000-0000-0000-0000-000000000002','Kenya Locations','David Amunga','https://github.com/davidamunga/kenya-locations','MIT','research','County names and codes from Kenya Locations; Copyright (c) 2025 David Amunga.',now()),
+-- Inbound farmer-channel reports (USSD/SMS/IVR/WhatsApp). This is the only source of
+-- community-classified observations in the model: the return path from the people a county
+-- allocation is spent on. Records land unverified and must not be presented as official.
+('00000000-0000-0000-0000-000000000003','Farmer channel field reports','TerraMavuno omnichannel',null,'Reporter-contributed; retained with consent','community','Self-reported field observations from farmers and field officers over USSD, SMS, IVR or WhatsApp. Unverified until reviewed; reporter identities are stored only as salted hashes.',now())
 on conflict(id) do nothing;
 
 insert into public.interventions(slug,name,category,description) values

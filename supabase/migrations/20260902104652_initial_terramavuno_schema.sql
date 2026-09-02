@@ -118,11 +118,18 @@ create table public.reports (
   id uuid primary key default extensions.gen_random_uuid(), owner_id uuid references public.profiles(id), simulation_id uuid references public.simulations(id),
   title text not null, format text not null, storage_path text, content jsonb not null default '{}', generated_at timestamptz not null default now()
 );
+-- A USSD/SMS caller has no auth.users row, so owner_id is nullable and such rows are
+-- identified by a salted hash of the MSISDN computed server-side. Raw phone numbers are
+-- never stored. At least one of the two identities must be present.
 create table public.conversations (
-  id uuid primary key default extensions.gen_random_uuid(), owner_id uuid not null references public.profiles(id), channel text not null,
-  external_thread_id text, state jsonb not null default '{}', created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+  id uuid primary key default extensions.gen_random_uuid(), owner_id uuid references public.profiles(id),
+  channel text not null check (channel in ('web','sms','ussd','ivr','whatsapp')),
+  channel_identity_hash text check (channel_identity_hash ~ '^[0-9a-f]{64}$'),
+  external_thread_id text, state jsonb not null default '{}', created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
+  constraint conversations_identity_present check (owner_id is not null or channel_identity_hash is not null)
 );
 create index conversations_owner_idx on public.conversations(owner_id,updated_at desc);
+create index conversations_channel_identity_idx on public.conversations(channel,channel_identity_hash,updated_at desc);
 create table public.sessions (
   id uuid primary key default extensions.gen_random_uuid(), conversation_id uuid not null references public.conversations(id) on delete cascade,
   channel_session_id text, started_at timestamptz not null default now(), ended_at timestamptz, context jsonb not null default '{}'
@@ -168,6 +175,12 @@ create policy "profile own read" on public.profiles for select to authenticated 
 create policy "profile own insert" on public.profiles for insert to authenticated with check ((select auth.uid())=id);
 create policy "profile own update" on public.profiles for update to authenticated using ((select auth.uid())=id) with check ((select auth.uid())=id);
 
+-- Ownership policies compare auth.uid() to owner_id. For channel-owned conversations
+-- (owner_id null, identified by channel_identity_hash) the comparison yields NULL, so those
+-- rows are invisible to anon and authenticated by design. Inbound channel writes and channel
+-- reads go through the service role in the API, which is also where the identity salt lives.
+-- The link from a stored field report back to its conversation belongs in provenance_events
+-- (no public grant), not on evidence_records, which anon can read once verified.
 do $$ declare t text; begin foreach t in array array['budgets','simulations','documents','reports','conversations'] loop
   execute format('create policy %I on public.%I for select to authenticated using ((select auth.uid())=owner_id)',t||'_own_select',t);
   execute format('create policy %I on public.%I for insert to authenticated with check ((select auth.uid())=owner_id)',t||'_own_insert',t);

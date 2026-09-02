@@ -9,6 +9,7 @@ Kenya-first spatial intelligence for climate action and agriculture. TerraMavuno
 - rainfall, drought, NDVI and water-infrastructure evidence layers with source/freshness/confidence labels
 - TerraTime playback from 2020 onward
 - Climate Action Simulator preloaded with **KES 10,000,000** and six intervention choices
+- farmer-channel return path: `record_field_report` and `POST /api/field-reports` accept an inbound USSD/SMS report as unverified `community` evidence, with hashed reporter identity and no raw phone numbers
 - Claude-compatible tool schemas and a small HTTP API
 - Supabase/Postgres/PostGIS migration, RLS, provenance model, 47-county seed
 
