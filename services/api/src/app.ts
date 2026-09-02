@@ -33,6 +33,7 @@ import { provider } from './data/provider.js';
 import { kilimoRouter } from './routes/kilimo.js';
 import { shareRouter } from './routes/share.js';
 import { meetingsRouter } from './routes/meetings.js';
+import { deliveriesRouter } from './routes/deliveries.js';
 import { voiceRouter } from './routes/voice.js';
 import { KILIMO_TOOLS, toAnthropicTools, toElevenLabsClientTools } from './shared.js';
 import {
@@ -170,6 +171,7 @@ export function createApp(deps: ChannelDeps = {}): Express {
   app.use('/api/voice', voiceRouter);
   app.use('/api/share', shareRouter);
   app.use('/api/meetings', meetingsRouter);
+  app.use('/api/deliveries', deliveriesRouter);
 
   // Africa's Talking USSD + SMS webhooks.
   app.use('/channels', createChannelRouter({ ...deps, store }));

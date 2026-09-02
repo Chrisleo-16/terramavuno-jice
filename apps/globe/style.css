@@ -9949,3 +9949,52 @@ body.scene-playback-mode #key-setup {
   align-self: center;
   margin: 0 12px;
 }
+
+/* ── Farm pin control ──────────────────────────
+   A delivery needs a point a driver can reach; without a pin the API falls
+   back to the ward centroid and flags the delivery as not routable. */
+.farm-pin-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 2px;
+  flex-wrap: wrap;
+}
+.farm-pin-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+.farm-pin-btn:hover,
+.farm-pin-btn:focus-visible {
+  border-color: rgba(52, 209, 123, 0.5);
+  color: var(--accent);
+}
+/* Armed: the next click on the globe drops the pin, so the control has to
+   look unmistakably different from its resting state. */
+.farm-pin-btn.armed {
+  border-color: rgba(52, 209, 123, 0.9);
+  background: rgba(52, 209, 123, 0.18);
+  color: var(--accent);
+  animation: farm-pin-pulse 1.6s ease-in-out infinite;
+}
+@keyframes farm-pin-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 209, 123, 0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(52, 209, 123, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .farm-pin-btn.armed { animation: none; }
+}
+.farm-pin-status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}

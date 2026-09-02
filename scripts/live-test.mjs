@@ -285,6 +285,112 @@ await check('Raw phone numbers are refused as a reporter ref', async () => {
   return `status=${res.status}`;
 });
 
+// ------------------------------------------------------ meetings + deliveries
+
+await check('Meetings list for a ward', async () => {
+  const body = await getJson(`${GLOBE}/api/meetings?ward=0539`);
+  assert(body.ok, 'ok=false');
+  assert(body.count > 0, 'no meetings');
+  // County-wide meetings must reach every ward.
+  assert(
+    body.meetings.some((m) => m.wardCode === null),
+    'county-wide meeting missing from a ward list',
+  );
+  return `${body.count} upcoming (dataMode=${body.dataMode})`;
+});
+
+await check('A community meeting is never dressed as official', async () => {
+  const body = await getJson(`${GLOBE}/api/meetings?scope=all`);
+  const community = body.meetings.filter((m) => m.authority === 'community');
+  for (const meeting of community) {
+    assert(/COMMUNITY/i.test(meeting.citation), `${meeting.id} lacks a community citation`);
+  }
+  return `${community.length} community notice(s) labelled`;
+});
+
+await check('Meeting RSVP records, and refuses an ambiguous reply', async () => {
+  const yes = await fetch(`${GLOBE}/api/meetings/mtg-collection-briefing/rsvp`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ farmerToken: 'K-001', response: 'ndio' }),
+  });
+  assert(yes.status === 202, `expected 202, got ${yes.status}`);
+
+  const vague = await fetch(`${GLOBE}/api/meetings/mtg-collection-briefing/rsvp`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ farmerToken: 'K-001', response: 'perhaps not' }),
+  });
+  assert(vague.status === 400, 'an ambiguous reply was accepted');
+  return 'yes recorded, ambiguous refused';
+});
+
+let trackingCode = '';
+await check('Delivery books off the engine allocation, not the request body', async () => {
+  const body = await getJson(`${GLOBE}/api/deliveries`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ farmerToken: 'K-001', bags: 99 }),
+  });
+  assert(body.ok, 'ok=false');
+  assert(body.delivery.bags === 4, `bags ${body.delivery.bags} != 4 (engine allocation)`);
+  assert(body.delivery.status === 'requested', 'a new delivery must not start confirmed');
+  trackingCode = body.delivery.trackingCode;
+  return `${trackingCode}, ${body.delivery.bags} bags`;
+});
+
+await check('Ward-centroid fallback is flagged as not routable', async () => {
+  const body = await getJson(`${GLOBE}/api/deliveries`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ farmerToken: 'K-001' }),
+  });
+  assert(body.delivery.destination.source === 'ward_centroid', 'expected the centroid fallback');
+  assert(body.routable === false, 'a ward centroid must not be routable');
+  assert(/pin your exact location/i.test(body.voice), 'voice does not ask for a pin');
+  return 'flagged, and the voice line asks for a pin';
+});
+
+await check('Voice booking thanks the farmer and promises details', async () => {
+  const body = await getJson(`${GLOBE}/api/deliveries`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ farmerToken: 'K-001' }),
+  });
+  assert(/thank you for booking/i.test(body.voice), 'no thank-you');
+  assert(/send you a link/i.test(body.voice), 'no promise of details');
+  assert(/still has to confirm/i.test(body.voice), 'requested/confirmed line missing');
+  assert(!body.voice.includes('*') && !body.voice.includes('http'), 'markup or URL in spoken text');
+  return 'wording verified';
+});
+
+await check('Delivery tracking accepts a loosely typed code', async () => {
+  assert(trackingCode.length > 0, 'no tracking code from the booking check');
+  const loose = trackingCode.replace('TM-', '').toLowerCase();
+  const body = await getJson(`${GLOBE}/api/deliveries/track/${loose}`);
+  assert(body.delivery.trackingCode === trackingCode, 'wrong delivery returned');
+  return `resolved "${loose}" -> ${trackingCode}`;
+});
+
+await check('A malformed tracking code is refused, not guessed', async () => {
+  const res = await fetch(`${GLOBE}/api/deliveries/track/hello`);
+  assert(res.status === 400, `expected 400, got ${res.status}`);
+  return 'refused';
+});
+
+await check('A pin far from the ward is rejected as a misdrop', async () => {
+  const res = await fetch(`${GLOBE}/api/deliveries`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      farmerToken: 'K-001',
+      location: { lat: -4.05, lon: 39.66, source: 'pin' },
+    }),
+  });
+  assert(res.status === 400, `expected 400, got ${res.status}`);
+  return 'Mombasa pin refused for a Kandara farmer';
+});
+
 // -------------------------------------------------------------- chat + voice
 
 await check(

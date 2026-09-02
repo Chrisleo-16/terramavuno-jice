@@ -71,6 +71,7 @@ import { installScopeMask } from './scopeMask.js';
 import { registerKilimoLayers } from './data/kilimo/index.js';
 import { initKilimoInteraction } from './chat/index.js';
 import { loadPhotorealisticTileset } from './mapStartup.js';
+import { installFarmPin } from './farmPin.js';
 
 initLogoGaze();
 
@@ -358,6 +359,14 @@ async function init() {
       // this Kenya has no borders at all until the camera reaches Murang'a.
       initialVisible: ['counties', 'wards'],
     });
+
+    // Farm pin: lets a farmer mark where they actually are, so a delivery has a
+    // destination instead of a ward centroid. Never allowed to break boot.
+    try {
+      window.__KILIMO__.farmPinControl = installFarmPin({ viewer });
+    } catch (error) {
+      console.warn('Farm pin unavailable (map still works):', error);
+    }
 
     // Interaction layer: the action runner, Claude chat panel, farmer result
     // card and ElevenLabs voice button. Mounted last, after the handle and the

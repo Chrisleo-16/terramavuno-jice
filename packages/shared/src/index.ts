@@ -32,3 +32,6 @@ export * from './data/index.js';
 
 /** Farmer-facing meetings: scheduling, RSVP, and channel rendering. */
 export * from './meetings/index.js';
+
+/** Deliveries: pinned locations, tracking, and the words spoken about them. */
+export * from './deliveries/index.js';

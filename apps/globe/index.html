@@ -129,6 +129,12 @@
         <div id="location-mini-city" class="location-mini-city">📍 Location: --</div>
         <div id="location-mini-poi" class="location-mini-poi">Landmark: --</div>
       </div>
+      <!-- Farm pin: a delivery needs a point a driver can reach, not a ward centroid. -->
+      <div class="farm-pin-row">
+        <button id="kilimo-pin-farm" type="button" class="farm-pin-btn" aria-pressed="false"
+          title="Mark your farm so a delivery can reach you">PIN MY FARM</button>
+        <span id="kilimo-pin-status" class="farm-pin-status" aria-live="polite"></span>
+      </div>
       <div class="dock-popover-content">
         <div class="location-city-row">
           <div id="location-pills" class="location-pills"></div>
