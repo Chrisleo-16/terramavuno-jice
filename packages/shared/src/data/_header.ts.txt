@@ -1,0 +1,95 @@
+/**
+ * Bundled offline Kilimo dataset — GENERATED FILE, do not hand-edit the data.
+ *
+ * Source of truth: ./kilimo-fallback.json (human-editable).
+ * Regenerate after editing the JSON:
+ *   node packages/shared/src/data/generate-index.mjs
+ * A vitest consistency test (./data-consistency.test.ts) fails if this file
+ * and the JSON drift apart, or if the data drifts from the engine fixtures.
+ *
+ * Why a .ts literal instead of a JSON import: packages/shared compiles with
+ * module NodeNext and no resolveJsonModule; embedding the literal keeps the
+ * package importable from Node (services/api) and Vite (apps/globe) alike
+ * with zero loader configuration.
+ *
+ * Shapes: programme/prices/depots/farmers are SUPERSETS of the eligibility
+ * engine's input types (../eligibility/types.ts) — every record can be passed
+ * straight into evaluateFarmer. The extra fields (town, classification,
+ * per-record evidence, ...) exist for map rendering and citation display.
+ */
+
+import type {
+  Depot,
+  EvidenceTag,
+  FarmerToken,
+  PriceRow,
+  ProgrammeRules,
+} from '../eligibility/types.js';
+
+/* ------------------------------------------------------------------ */
+/* Data-layer types (supersets of the engine input types)              */
+/* ------------------------------------------------------------------ */
+
+/** Engine ProgrammeRules plus provenance/display extras. */
+export interface FallbackProgramme extends ProgrammeRules {
+  authority: 'official' | 'reported';
+  source: string;
+  effectiveFrom: string;
+  /** kenya-locations ward codes matching participatingWards (names) 1:1. */
+  participatingWardCodes: string[];
+}
+
+/** Engine Depot plus display extras. */
+export interface FallbackDepot extends Depot {
+  town: string;
+  county: string;
+}
+
+/** Engine FarmerToken plus provenance extras. */
+export interface FallbackFarmer extends FarmerToken {
+  classification: 'simulated';
+  evidence: EvidenceTag;
+}
+
+/** Kandara ward with kenya-locations codes and a calculated centroid. */
+export interface WardRecord {
+  code: string;
+  name: string;
+  constituency: string;
+  constituencyCode: string;
+  county: string;
+  countyCode: string;
+  lat: number;
+  lon: number;
+  participating: boolean;
+  evidence: EvidenceTag;
+}
+
+/** A declared data source; every EvidenceTag.sourceId resolves here. */
+export interface SourceRecord {
+  id: string;
+  name: string;
+  publisher: string;
+  authority: 'official' | 'reported';
+  effectiveDate: string | null;
+  url: string | null;
+  license: string;
+  notes: string;
+}
+
+/** The single bundled snapshot read when Supabase is unavailable. */
+export interface KilimoFallback {
+  dataMode: 'bundled';
+  generatedAt: string;
+  programme: FallbackProgramme;
+  prices: PriceRow[];
+  depots: FallbackDepot[];
+  farmers: FallbackFarmer[];
+  wards: WardRecord[];
+  sources: SourceRecord[];
+}
+
+/* ------------------------------------------------------------------ */
+/* Data (generated from kilimo-fallback.json)                          */
+/* ------------------------------------------------------------------ */
+

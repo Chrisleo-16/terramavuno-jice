@@ -5,5 +5,8 @@ dist/
 .DS_Store
 *.log
 .supabase/
+# Reference clones are read-only study material. references/agrion is
+# UNLICENSED and must never be committed; ignore the whole directory.
+references/
 references/*/.git/
 

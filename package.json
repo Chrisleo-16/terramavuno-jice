@@ -2,7 +2,7 @@
   "name": "terramavuno",
   "version": "0.1.0",
   "private": true,
-  "description": "Kenya-first climate and agricultural spatial decision platform",
+  "description": "TerraMavuno: Kilimo, Nitapata? \u2014 Kenya's spatial evidence layer for agricultural public services",
   "workspaces": [
     "apps/*",
     "services/*",
@@ -10,16 +10,27 @@
     "modules/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace @terramavuno/web",
+    "build": "npm run build --workspace @terramavuno/shared && npm run build --workspace @terramavuno/api && npm run build --workspace @terramavuno/globe",
+    "dev": "npm run dev --workspace @terramavuno/globe",
     "dev:api": "npm run dev --workspace @terramavuno/api",
-    "build": "npm run build --workspace @terramavuno/shared && npm run build --workspace @terramavuno/api && npm run build --workspace @terramavuno/web",
+    "geo": "node scripts/fetch-kenya-geometry.mjs",
+    "predev:api": "npm run shared:build",
+    "pretest": "npm run shared:build",
+    "pretypecheck": "npm run shared:build",
+    "prevalidate:data": "npm run shared:build",
+    "prevoice:agent": "npm run shared:build",
+    "shared:build": "npm run build --workspace @terramavuno/shared",
     "test": "npm run test --workspace @terramavuno/shared && npm run test --workspace @terramavuno/api",
-    "typecheck": "npm run typecheck --workspace @terramavuno/shared && npm run typecheck --workspace @terramavuno/api && npm run typecheck --workspace @terramavuno/web"
+    "tools:elevenlabs": "node scripts/print-elevenlabs-tools.mjs",
+    "typecheck": "npm run typecheck --workspace @terramavuno/shared && npm run typecheck --workspace @terramavuno/api",
+    "validate:data": "node scripts/validate-bundled-data.mjs",
+    "voice:agent": "node scripts/create-elevenlabs-agent.mjs"
   },
   "engines": {
     "node": ">=22"
   },
   "devDependencies": {
+    "puppeteer": "^25.9.0",
     "supabase": "^2.116.0"
   }
 }

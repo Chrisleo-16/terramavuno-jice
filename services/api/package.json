@@ -1,2 +1,31 @@
-{"name":"@terramavuno/api","version":"0.1.0","private":true,"type":"module","scripts":{"dev":"tsx watch src/server.ts","build":"tsc -p tsconfig.json","start":"node dist/server.js","test":"vitest run","typecheck":"tsc -p tsconfig.json --noEmit"},"dependencies":{"@terramavuno/shared":"*","cors":"^2.8.5","express":"^5.1.0","zod":"^4.1.5"},"devDependencies":{"@types/cors":"^2.8.19","@types/express":"^5.0.3","supertest":"^7.1.4","@types/supertest":"^6.0.3","tsx":"^4.20.5","typescript":"^5.9.2","vitest":"^3.2.4"}}
-
+{
+  "name": "@terramavuno/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.123.0",
+    "@supabase/supabase-js": "^2.113.0",
+    "@terramavuno/shared": "*",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
