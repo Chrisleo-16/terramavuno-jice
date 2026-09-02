@@ -29,3 +29,6 @@ export * from './tools/index.js';
 
 /* ---- Bundled offline dataset (the zero-network demo path) ---------------- */
 export * from './data/index.js';
+
+/** Farmer-facing meetings: scheduling, RSVP, and channel rendering. */
+export * from './meetings/index.js';

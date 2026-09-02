@@ -107,6 +107,23 @@ export const env = {
     return val('ELEVENLABS_AGENT_ID');
   },
 
+  /**
+   * open-wa (@open-wa/wa-automate) running its EASY API server. Preferred over
+   * the other two for farmer messaging: it drives an ordinary WhatsApp account,
+   * so meeting notices can go to any number without the Cloud API's
+   * template-approval process for business-initiated messages.
+   */
+  get openWaApiUrl(): string | undefined {
+    return val('OPENWA_API_URL');
+  },
+  get openWaApiKey(): string | undefined {
+    return val('OPENWA_API_KEY');
+  },
+  /** Optional: open-wa session name, only needed for multi-session hosts. */
+  get openWaSession(): string | undefined {
+    return val('OPENWA_SESSION');
+  },
+
   /** WhatsApp share (Evolution API preferred, Cloud API fallback). */
   get evolutionApiUrl(): string | undefined {
     return val('EVOLUTION_API_URL');
@@ -140,6 +157,7 @@ export function integrationFlags(): IntegrationFlags {
     supabase: env.supabaseUrl !== undefined && env.supabaseSecretKey !== undefined,
     elevenlabs: env.elevenLabsApiKey !== undefined && env.elevenLabsAgentId !== undefined,
     whatsapp:
+      env.openWaApiUrl !== undefined ||
       (env.evolutionApiUrl !== undefined &&
         env.evolutionApiKey !== undefined &&
         env.evolutionInstanceName !== undefined) ||

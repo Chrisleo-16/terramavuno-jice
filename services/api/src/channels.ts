@@ -17,9 +17,10 @@
 import {Router, type Request} from 'express';
 import {timingSafeEqual} from 'node:crypto';
 import {
-  advisorySms, fieldReportAckSms, parseSmsCommand, matchCounty, renderUssd, renderUssdPayload,
-  segmentSms, SMS_HELP, type UssdEffect
+  advisorySms, fieldReportAckSms, formatMeetingForSms, parseSmsCommand, matchCounty, renderUssd,
+  renderUssdPayload, segmentSms, SMS_HELP, upcomingForWard, type UssdEffect
 } from '@terramavuno/shared';
+import {getMeetingsStore} from './meetings/store.js';
 import {loadAfricasTalkingConfig, sendSms, type AfricasTalkingConfig} from './africastalking.js';
 import {buildFieldReport, hashIdentity, type FieldReportRecord} from './field-reports.js';
 import {InMemoryChannelStore, type ChannelStore} from './channel-store.js';
@@ -149,6 +150,29 @@ export function createChannelRouter(deps: ChannelDeps = {}): Router {
         // twice and read as if the report was filed twice.
         if (result.duplicate) return void console.log('[channels] ignored duplicate inbound SMS (provider retry)');
         return void reply(from, fieldReportAckSms(county.name));
+      }
+      // MEETING / MKUTANO — the feature-phone route to the meeting calendar. A
+      // farmer without a smartphone must not be the last to hear that a
+      // collection briefing moved.
+      if (command.kind === 'meetings') {
+        const ward = (command.county ?? '').trim();
+        const {data} = await getMeetingsStore().list();
+        const upcoming = upcomingForWard(data, ward.length > 0 ? ward : null);
+        if (upcoming.length === 0) {
+          return void reply(from, 'TerraMavuno: no meetings scheduled for your ward yet.');
+        }
+        // One SMS for the next meeting only. Listing all of them would run to
+        // several billed segments for information most farmers will not act on.
+        return void reply(from, formatMeetingForSms(upcoming[0]!));
+      }
+      if (command.kind === 'rsvp') {
+        // We can read the answer, but not which meeting it is for: SMS carries
+        // no thread. Say so rather than guessing at the nearest meeting and
+        // recording an attendance the farmer never gave.
+        return void reply(
+          from,
+          'TerraMavuno: reply received. To confirm attendance, answer on WhatsApp or dial the USSD menu - SMS cannot tell us which meeting you mean.'
+        );
       }
       if (command.kind === 'outlook') {
         const county = matchCounty(command.county ?? '');

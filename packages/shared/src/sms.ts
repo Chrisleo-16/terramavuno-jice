@@ -100,7 +100,7 @@ export function fieldReportAckSms(county: string): string {
 export const SMS_OPT_OUT_KEYWORDS = ['stop', 'stopall', 'unsubscribe', 'quit', 'cancel', 'end'] as const;
 
 export interface ParsedSmsCommand {
-  kind: 'report' | 'outlook' | 'opt_out' | 'help';
+  kind: 'report' | 'outlook' | 'opt_out' | 'help' | 'meetings' | 'rsvp';
   county?: string;
   note?: string;
 }
@@ -115,6 +115,9 @@ function splitCountyPrefix(rest: string): {county: string; note: string} {
   }
   return {county: tokens[0] ?? '', note: tokens.slice(1).join(' ')};
 }
+
+/** Words that mean a farmer is answering an invitation rather than asking a question. */
+const RSVP_KEYWORDS = ['yes', 'no', 'maybe', 'ndio', 'ndiyo', 'hapana', 'labda', 'sawa'];
 
 /**
  * Parse an inbound SMS body. Deliberately forgiving: farmers do not type keywords precisely, and a
@@ -131,10 +134,18 @@ export function parseSmsCommand(body: string): ParsedSmsCommand {
     const {county, note} = splitCountyPrefix(rest);
     return {kind: 'report', county, note};
   }
+  // MEETING / MKUTANO — what is coming up, so a farmer with no smartphone is
+  // not the last to hear about a collection briefing.
+  if (first === 'meeting' || first === 'meetings' || first === 'mkutano' || first === 'mikutano') {
+    return {kind: 'meetings', county: rest};
+  }
+  // A bare YES/NO/MAYBE (or ndio/hapana/labda) is an answer to the last
+  // invitation we sent, not a county lookup.
+  if (RSVP_KEYWORDS.includes(first)) return {kind: 'rsvp', note: first};
   if (first === 'outlook' || first === 'rain' || first === 'drought') return {kind: 'outlook', county: rest};
   if (!first || first === 'help') return {kind: 'help'};
   // Bare county name is the most common thing a farmer will send.
   return {kind: 'outlook', county: text};
 }
 
-export const SMS_HELP = toGsm7('TerraMavuno: send a county name for its outlook, or REPORT <county> <what you see> to log a field report. Reply STOP to opt out.');
+export const SMS_HELP = toGsm7('TerraMavuno: send a county name for its outlook, REPORT <county> <what you see> to log a field report, or MEETING for upcoming meetings. Reply STOP to opt out.');

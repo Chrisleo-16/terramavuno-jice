@@ -32,6 +32,7 @@ import { chatHandler } from './claude/route.js';
 import { provider } from './data/provider.js';
 import { kilimoRouter } from './routes/kilimo.js';
 import { shareRouter } from './routes/share.js';
+import { meetingsRouter } from './routes/meetings.js';
 import { voiceRouter } from './routes/voice.js';
 import { KILIMO_TOOLS, toAnthropicTools, toElevenLabsClientTools } from './shared.js';
 import {
@@ -168,6 +169,7 @@ export function createApp(deps: ChannelDeps = {}): Express {
   // ElevenLabs signed-URL broker and WhatsApp share.
   app.use('/api/voice', voiceRouter);
   app.use('/api/share', shareRouter);
+  app.use('/api/meetings', meetingsRouter);
 
   // Africa's Talking USSD + SMS webhooks.
   app.use('/channels', createChannelRouter({ ...deps, store }));
