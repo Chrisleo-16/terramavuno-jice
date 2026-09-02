@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "npm run dev --workspace @terramavuno/web",
     "dev:api": "npm run dev --workspace @terramavuno/api",
+    "channels:urls": "node scripts/print-channel-urls.mjs",
     "build": "npm run build --workspace @terramavuno/shared && npm run build --workspace @terramavuno/api && npm run build --workspace @terramavuno/web",
     "test": "npm run test --workspace @terramavuno/shared && npm run test --workspace @terramavuno/api",
     "typecheck": "npm run typecheck --workspace @terramavuno/shared && npm run typecheck --workspace @terramavuno/api && npm run typecheck --workspace @terramavuno/web"

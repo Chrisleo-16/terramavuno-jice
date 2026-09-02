@@ -9,9 +9,10 @@ Kenya-first spatial intelligence for climate action and agriculture. TerraMavuno
 - rainfall, drought, NDVI and water-infrastructure evidence layers with source/freshness/confidence labels
 - TerraTime playback from 2020 onward
 - Climate Action Simulator preloaded with **KES 10,000,000** and six intervention choices
-- farmer-channel return path: `record_field_report` and `POST /api/field-reports` accept an inbound USSD/SMS report as unverified `community` evidence, with hashed reporter identity and no raw phone numbers
+- working Africa's Talking farmer channel: USSD menu (outlook, field report, SMS advisory) and inbound SMS grammar (`REPORT <county> …`, bare county name, `STOP`/`START`), with hashed reporter identity, no raw phone numbers, and carrier limits enforced in code
 - Claude-compatible tool schemas and a small HTTP API
-- Supabase/Postgres/PostGIS migration, RLS, provenance model, 47-county seed
+- Supabase/Postgres/PostGIS migrations, RLS, provenance model, 47-county seed
+- durable farmer-channel storage: an inbound report writes `conversations` + `evidence_records` + `provenance_events`, deduplicated against provider retries by unique index, with the reporter link withheld from public reads
 
 All dashboard values are visibly marked **SIMULATED BENCHMARK**. They are not official costs, forecasts or programme claims.
 
@@ -32,7 +33,9 @@ See [RUNBOOK](docs/RUNBOOK.md), [API keys](docs/API_KEYS.md), [demo script](docs
 
 ## Repository map
 
-`apps/web` demo UI • `services/api` API • `packages/shared` simulator and tool schemas • `packages/geo` geography boundary • `packages/ui` future design system • `modules/*` domain boundaries • `supabase/migrations` database • `data` licensed/generated seed inputs • `references` isolated upstream clones • `docs` product/operations • `scripts` repeatable utilities.
+`apps/web` demo UI • `services/api` API and Africa's Talking webhooks • `packages/shared` simulator, tool schemas, USSD menu and SMS logic • `packages/geo` geography boundary • `packages/ui` future design system • `modules/*` domain boundaries • `supabase/migrations` database • `data` licensed/generated seed inputs • `references` isolated upstream clones • `docs` product/operations • `scripts` repeatable utilities.
+
+For the farmer channel see [omnichannel](modules/omnichannel/README.md) and the Africa's Talking section of the [RUNBOOK](docs/RUNBOOK.md).
 
 ## License
 

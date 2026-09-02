@@ -1,30 +1,48 @@
-import express from 'express'; import cors from 'cors'; import {createHash} from 'node:crypto'; import {z} from 'zod'; import {simulateClimateAction,claudeTools,farmerChannels} from '@terramavuno/shared';
-export const app=express(); app.use(cors());app.use(express.json());
+import express,{type Express} from 'express'; import cors from 'cors'; import {z} from 'zod'; import {simulateClimateAction,claudeTools,farmerChannels} from '@terramavuno/shared';
+import {buildFieldReport,fieldReportSchema,usingDevSalt,FIELD_REPORT_DISCLAIMER} from './field-reports.js';
+import {createChannelRouter,type ChannelDeps} from './channels.js';
+import {loadAfricasTalkingConfig} from './africastalking.js';
+import {InMemoryChannelStore} from './channel-store.js';
+import {createSupabaseChannelStore,loadSupabaseConfig} from './supabase-channel-store.js';
+
 const input=z.object({county:z.string().min(1),budgetKes:z.number().positive(),objective:z.enum(['drought-resilience','food-security','farmer-income','water-security']),horizonYears:z.number().int().min(1).max(20)});
 
-// Inbound farmer-channel return path. Raw MSISDNs must never reach the API or the database;
-// an opaque provider session reference is salted and hashed here into the reporter_ref that
-// conversations.channel_identity_hash expects.
-const FIELD_REPORT_SOURCE_ID='00000000-0000-0000-0000-000000000003';
-const msisdnLike=/^\+?\d[\d\s-]{6,}$/;
-const hashIdentity=(ref:string)=>createHash('sha256').update(`${process.env.FIELD_REPORT_SALT??'terramavuno-dev-salt'}:${ref}`).digest('hex');
-const fieldReport=z.object({channel:z.enum(farmerChannels),location:z.string().min(1),observation:z.string().min(1).max(2000),indicator:z.string().min(1).max(64).optional(),value:z.number().optional(),unit:z.string().max(32).optional(),observed_at:z.iso.datetime().optional(),reporter_ref:z.string().regex(/^[0-9a-f]{64}$/,'reporter_ref must be a 64-character sha256 hex digest').optional(),session_ref:z.string().min(1).max(128).optional(),confidence:z.enum(['high','moderate','limited','unknown']).default('unknown')})
-  .refine(v=>!msisdnLike.test(v.session_ref??''),{path:['session_ref'],message:'session_ref looks like a phone number; hash channel identities in the adapter before they reach the API'});
-app.get('/health',(_req,res)=>res.json({status:'ok',service:'terramavuno-api',dataMode:'simulated-benchmark'}));
-app.get('/api/tools',(_req,res)=>res.json({tools:claudeTools,farmerChannels}));
-app.post('/api/simulations',(req,res)=>{const parsed=input.safeParse(req.body);if(!parsed.success)return res.status(400).json({error:'Invalid simulation request',details:parsed.error.issues});return res.json({input:parsed.data,disclaimer:'SIMULATED BENCHMARK — validate costs with official county procurement and programme data before decisions.',options:simulateClimateAction(parsed.data)});});
-app.post('/api/field-reports',(req,res)=>{
-  const parsed=fieldReport.safeParse(req.body);
-  if(!parsed.success)return res.status(400).json({error:'Invalid field report',details:parsed.error.issues});
-  const {session_ref,...report}=parsed.data;
-  const now=new Date().toISOString();
-  return res.status(202).json({
-    record:{...report,source_id:FIELD_REPORT_SOURCE_ID,classification:'community',verification_status:'unverified',
-      observed_at:report.observed_at??now,ingested_at:now,
-      reporter_ref:report.reporter_ref??(session_ref?hashIdentity(session_ref):null)},
-    disclaimer:'COMMUNITY REPORT — unverified, self-reported field observation. It is not official evidence and is not promoted to an observation without review.',
-    persisted:false,
-    note:'P0 exercises the channel contract only. No provider webhook or Supabase client is connected, so nothing is written to conversations or evidence_records yet.'
-  });
-});
+/** `deps` lets tests inject a channel store and a fake SMS sender instead of a live provider. */
+export function createApp(deps: ChannelDeps = {}): Express {
+  const app=express(); app.use(cors()); app.use(express.json());
+  // Africa's Talking posts webhooks as application/x-www-form-urlencoded.
+  app.use(express.urlencoded({extended:false}));
 
+  // Durable storage when Supabase is configured; in-memory otherwise, so the channel still runs.
+  const store=deps.store ?? createSupabaseChannelStore() ?? new InMemoryChannelStore();
+
+  app.get('/health',(_req,res)=>{const at=loadAfricasTalkingConfig();return res.json({status:'ok',service:'terramavuno-api',dataMode:'simulated-benchmark',
+    channels:{provider:at?`africastalking:${at.environment}`:'not-configured',webhooksEnabled:Boolean(process.env.CHANNEL_WEBHOOK_TOKEN?.trim()),identitySalt:usingDevSalt()?'dev-default (set FIELD_REPORT_SALT)':'configured',
+      store:deps.store?'injected':loadSupabaseConfig()?'supabase (service role)':'in-memory (reports lost on restart)'}});});
+  app.get('/api/tools',(_req,res)=>res.json({tools:claudeTools,farmerChannels}));
+  app.post('/api/simulations',(req,res)=>{const parsed=input.safeParse(req.body);if(!parsed.success)return res.status(400).json({error:'Invalid simulation request',details:parsed.error.issues});return res.json({input:parsed.data,disclaimer:'SIMULATED BENCHMARK — validate costs with official county procurement and programme data before decisions.',options:simulateClimateAction(parsed.data)});});
+  app.post('/api/field-reports',async(req,res)=>{
+    const parsed=fieldReportSchema.safeParse(req.body);
+    if(!parsed.success)return res.status(400).json({error:'Invalid field report',details:parsed.error.issues});
+    const record=buildFieldReport(parsed.data);
+    // `conversations` requires an account or a hashed channel identity, so a report with neither
+    // cannot be attached to one. Report that honestly instead of dropping it silently.
+    if(!record.reporter_ref){
+      return res.status(202).json({record,disclaimer:FIELD_REPORT_DISCLAIMER,persisted:false,
+        note:'Not stored: no reporter_ref or session_ref supplied, so the report cannot be attached to a conversation.'});
+    }
+    try{
+      const {id}=await store.openConversation(record.channel,record.reporter_ref);
+      const result=await store.saveFieldReport(id,record);
+      return res.status(202).json({record,disclaimer:FIELD_REPORT_DISCLAIMER,persisted:result.persisted,duplicate:result.duplicate??false,
+        note:result.persisted?'Stored as unverified community evidence with a provenance event.':'Held in memory only: Supabase is not configured (SUPABASE_URL / SUPABASE_SECRET_KEY).'});
+    }catch(err){
+      console.error('[api] field report persistence failed:',err instanceof Error?err.message:err);
+      return res.status(503).json({error:'Field report accepted but could not be stored',record,disclaimer:FIELD_REPORT_DISCLAIMER,persisted:false});
+    }
+  });
+  app.use('/channels',createChannelRouter({...deps,store}));
+  return app;
+}
+
+export const app=createApp();

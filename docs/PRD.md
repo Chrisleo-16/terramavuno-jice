@@ -26,11 +26,15 @@ Step 7 closes the loop: it is what turns a spending comparison into a measurable
 - Simulation output is deterministic, tested and never described as an official estimate.
 - Every durable evidence record can identify its source, time, confidence and transformation.
 - User-owned records are protected with RLS; secret/service keys never enter browser code.
-- The farmer channel contract exists in P0: `record_field_report` accepts inbound reports from `ussd`/`sms`/`ivr`/`whatsapp`/`web`, `conversations` can hold a session for a caller who has no account, and inbound reports land as `community` classification pending verification. Provider connection is a later phase; the contract and the storage are not.
-- No raw phone number is stored. Channel identity is a salted hash, and channel-owned conversations are invisible to `anon`/`authenticated` under RLS.
+- The farmer channel runs in P0: the Africa's Talking USSD and inbound-SMS callbacks are implemented and tested, `record_field_report` accepts inbound reports from `ussd`/`sms`/`ivr`/`whatsapp`/`web`, `conversations` can hold a session for a caller who has no account, and inbound reports land as `community` classification pending verification. Live provider credentials change whether an SMS leaves the building, not whether the channel exists.
+- No raw phone number is stored, logged or echoed. Channel identity is a salted hash, and channel-owned conversations are invisible to `anon`/`authenticated` under RLS.
+- Carrier limits are enforced in code, not hoped for: a USSD reply always fits 182 septets including its `CON`/`END` prefix, and every county advisory fits one billed 160-septet SMS segment.
+- Callers can opt out. `STOP` silences the channel for that identity and is honoured by the USSD advisory path too, because consent is keyed to the identity hash rather than to a conversation.
+- An accepted report is durable when Supabase is configured: `conversations` + `evidence_records` + a `provenance_events` row carrying input/output hashes and the transformation. A provider retry is deduplicated by unique index, not by hope, and does not bill a second acknowledgement.
+- A verified community claim cannot be traced back to its reporter by an anonymous reader: `conversation_id` is withheld from the public column grant on `evidence_records`.
 
 ## Later phases
 
-Live ingestion, official county budget imports, calibrated cost catalogues, voice execution, live Africa's Talking USSD/SMS provider connection plus IVR and WhatsApp adapters, a verification workflow that promotes `community` reports to verified evidence, report export, farmer cases, logistics, site placement and authenticated collaboration. These remain integrations, not claims of P0 completion.
+Live ingestion, official county budget imports, calibrated cost catalogues, voice execution, IVR and WhatsApp adapters, per-identity rate limiting on inbound reports, delivery-report persistence, a verification workflow that promotes `community` reports to verified evidence, report export, farmer cases, logistics, site placement and authenticated collaboration. These remain integrations, not claims of P0 completion.
 
-The distinction for the farmer channel: the **contract** (inbound tool, channel-agnostic conversation storage, community classification, hashed identity) is P0. The **provider wiring and the verification workflow** are later. A later-phase provider does not make the channel a later-phase concern.
+The distinction for the farmer channel: the **USSD menu, SMS grammar, provider client, webhooks and Supabase persistence** are P0 and tested. What is still missing is the **verification workflow** — reports are stored as unverified community evidence and stay invisible to public readers until someone reviews them, so field truth cannot yet actually move a claim's confidence. That review step, not the plumbing, is now the gap between the channel and the impact claim.

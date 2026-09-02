@@ -6,4 +6,4 @@ dist/
 *.log
 .supabase/
 references/*/.git/
-
+.env.example
