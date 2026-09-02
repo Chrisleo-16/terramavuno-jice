@@ -1,0 +1,16 @@
+import {useEffect,useRef,useState} from 'react';
+import {Viewer,Cartesian2,Cartesian3,Color,OpenStreetMapImageryProvider,ImageryLayer,ScreenSpaceEventType} from 'cesium';
+import {counties,LayerKey,layers} from '../data';
+
+type Props={selected:string;onSelect:(name:string)=>void;activeLayers:Set<LayerKey>;year:number};
+export function MapView({selected,onSelect,activeLayers,year}:Props){
+  const el=useRef<HTMLDivElement>(null); const viewerRef=useRef<Viewer|null>(null); const [mode,setMode]=useState<'3D'|'2D'>('3D');
+  useEffect(()=>{if(mode!=='3D'||!el.current)return; const viewer=new Viewer(el.current,{animation:false,timeline:false,baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,infoBox:false,selectionIndicator:false,baseLayer:new ImageryLayer(new OpenStreetMapImageryProvider({url:'https://tile.openstreetmap.org/'}))}); viewer.scene.globe.baseColor=Color.fromCssColorString('#07120d'); viewer.camera.flyTo({destination:Cartesian3.fromDegrees(37.8,0.1,2200000),duration:0});
+    counties.forEach(c=>{const drought= Math.min(100,c.drought+(year-2024)*2); viewer.entities.add({name:c.name,position:Cartesian3.fromDegrees(c.lng,c.lat,0),point:{pixelSize:c.name===selected?18:11,color:Color.fromCssColorString(drought>70?'#ff735c':drought>40?'#ffc857':'#58d68d'),outlineColor:Color.WHITE,outlineWidth:c.name===selected?3:1},label:{text:c.name,font:'12px sans-serif',fillColor:Color.WHITE,pixelOffset:new Cartesian2(0,-20),showBackground:true,backgroundColor:Color.fromCssColorString('#081811cc')}});});
+    const handler=viewer.screenSpaceEventHandler; handler.setInputAction((click:{position:Cartesian2})=>{const picked=viewer.scene.pick(click.position) as {id?:{name?:string}}|undefined; const name=picked?.id?.name;if(name)onSelect(name);},ScreenSpaceEventType.LEFT_CLICK);
+    viewerRef.current=viewer; return()=>{if(!viewer.isDestroyed())viewer.destroy();viewerRef.current=null};},[mode,year,activeLayers]);
+  useEffect(()=>{const c=counties.find(x=>x.name===selected); if(c&&viewerRef.current)viewerRef.current.camera.flyTo({destination:Cartesian3.fromDegrees(c.lng,c.lat,420000),duration:1.1});},[selected]);
+  return <section className="map-shell"><div className="map-toolbar"><span>KENYA OPERATING PICTURE</span><button onClick={()=>setMode(mode==='3D'?'2D':'3D')}>{mode==='3D'?'Switch to 2D fallback':'Return to 3D globe'}</button></div>
+    {mode==='3D'?<div className="cesium-map" ref={el}/>:<FallbackMap selected={selected} onSelect={onSelect}/>}<div className="map-legend">{layers.filter(l=>activeLayers.has(l.key)).map(l=><span key={l.key}><i style={{background:l.color}}/>{l.label}</span>)}<strong>{year}</strong></div></section>;
+}
+function FallbackMap({selected,onSelect}:{selected:string;onSelect:(s:string)=>void}){return <div className="fallback-map"><svg viewBox="0 0 620 560" role="img" aria-label="2D Kenya evidence map"><path className="kenya" d="M184 43 L388 54 524 183 488 337 405 493 233 516 105 395 125 265 85 168z"/>{counties.map(c=>{const x=100+(c.lng-34)*92,y=480-(c.lat+4.5)*54;return <g key={c.name} onClick={()=>onSelect(c.name)} className="county-dot"><circle cx={x} cy={y} r={selected===c.name?13:8} className={c.drought>70?'hot':'ok'}/><text x={x+12} y={y+4}>{c.name}</text></g>})}</svg></div>}
