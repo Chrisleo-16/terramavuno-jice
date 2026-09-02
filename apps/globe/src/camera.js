@@ -54,6 +54,19 @@ export function flyToPreset(viewer, presetName, duration = 3.0) {
  */
 export const KENYA_OVERVIEW = CAMERA_PRESETS.kenya;
 
+/**
+ * The Kandara constituency footprint, as a sphere the camera can frame.
+ * Centre is the constituency centroid; the radius covers the six participating
+ * wards with a little air around them so the boundaries are not cropped.
+ */
+export const KANDARA_EXTENT = new Cesium.BoundingSphere(
+  Cesium.Cartesian3.fromDegrees(36.95, -0.85, 0),
+  16000,
+);
+
+/** Viewing distance for the settled Murang'a shot. */
+export const KANDARA_RANGE_M = 34000;
+
 /** How long the camera holds on the Kenya-wide view before drilling in (ms). */
 export const KENYA_HOLD_MS = 3500;
 
@@ -152,13 +165,18 @@ export function flyToKenya(viewer, options = {}) {
         holdTimer = null;
         if (cancelled) return;
         stage('muranga');
-        viewer.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(36.95, -0.85, 30000),
-          orientation: {
-            heading: Cesium.Math.toRadians(10),
-            pitch: Cesium.Math.toRadians(-45),
-            roll: 0.0,
-          },
+        // flyToBoundingSphere, NOT flyTo(destination): a tilted flyTo puts the
+        // camera AT the coordinate and looks off into the distance, which left
+        // Kandara sliding off the bottom of the scope. A bounding sphere is
+        // framed — Cesium solves for a camera that keeps the whole sphere
+        // centred at the requested tilt, so the wards land mid-screen at any
+        // pitch or viewport aspect.
+        viewer.camera.flyToBoundingSphere(KANDARA_EXTENT, {
+          offset: new Cesium.HeadingPitchRange(
+            Cesium.Math.toRadians(10),
+            Cesium.Math.toRadians(-52),
+            KANDARA_RANGE_M,
+          ),
           duration: 4.5,
           easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
           complete: () => {

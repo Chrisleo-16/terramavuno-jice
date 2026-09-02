@@ -17,6 +17,7 @@
     "db:status": "node scripts/db-push.mjs",
     "dev": "npm run dev --workspace @terramavuno/globe",
     "dev:api": "npm run dev --workspace @terramavuno/api",
+    "docs:mermaid": "node scripts/validate-mermaid.mjs",
     "geo": "node scripts/fetch-kenya-geometry.mjs",
     "predev:api": "npm run shared:build",
     "pretest": "npm run shared:build",

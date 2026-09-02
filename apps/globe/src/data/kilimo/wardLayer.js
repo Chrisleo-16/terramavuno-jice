@@ -2,7 +2,7 @@
  * @module data/kilimo/wardLayer
  * @description Layer 'wards' — the Murang'a county outline plus the six
  * participating Kandara ward polygons, in the God's Eye View visual language:
- * a barely-there glass fill, a glowing accent outline, and ward-name cards
+ * a barely-there glass fill, a cased accent outline, and ward-name cards
  * published through the world overlay so the label arbiter de-clutters them on
  * zoom instead of letting six labels pile on one hillside.
  *
@@ -38,6 +38,30 @@ import {
   setEvidenceDecoration,
 } from './evidenceBadges.js';
 import { defineKilimoLayer, installKilimoPickHandler, kilimoEntryDefaults } from './layerKit.js';
+
+/**
+ * Boundary line weights.
+ *
+ * A single thin glowing polyline disappears against satellite imagery: the glow
+ * spreads the colour out and the 2.5px core is lost in the terrain texture. So
+ * every boundary is drawn TWICE — a dark casing underneath, then a crisp opaque
+ * core on top. That is the standard cartographic trick for line work over
+ * photography, and it is what makes the wards readable at county zoom.
+ */
+const LINE = {
+  wardCore: 4.5,
+  wardCasing: 8.5,
+  wardCoreSelected: 7,
+  wardCasingSelected: 12,
+  countyCore: 3.5,
+  countyCasing: 7,
+};
+
+/** Casing colour — near-black, semi-opaque, so the core reads on any basemap. */
+const CASING_COLOR = Cesium.Color.fromCssColorString('#04070d').withAlpha(0.62);
+
+/** Marks an entity as a casing so selection restyling never recolours it. */
+const CASING_FLAG = '__kilimoCasing';
 
 /** Entity-id prefix — also the pick-ownership key for this layer. */
 export const WARD_ENTITY_PREFIX = 'kilimo-ward:';
@@ -243,12 +267,15 @@ export function createWardLayer(ctx) {
         );
       }
       if (entity.polyline) {
-        entity.polyline.width = selected ? 4 : 2.5;
-        entity.polyline.material = new Cesium.PolylineGlowMaterialProperty({
-          glowPower: selected ? 0.35 : 0.18,
-          color: Cesium.Color.fromCssColorString(entity.__kilimoAccent)
-            .withAlpha(selected ? 0.95 : 0.7),
-        });
+        if (entity[CASING_FLAG]) {
+          // The casing only ever thickens — recolouring it would defeat its job.
+          entity.polyline.width = selected ? LINE.wardCasingSelected : LINE.wardCasing;
+        } else {
+          entity.polyline.width = selected ? LINE.wardCoreSelected : LINE.wardCore;
+          entity.polyline.material = new Cesium.ColorMaterialProperty(
+            Cesium.Color.fromCssColorString(entity.__kilimoAccent).withAlpha(1),
+          );
+        }
       }
     }
   };
@@ -283,15 +310,23 @@ export function createWardLayer(ctx) {
       if (countyFeature) {
         for (const [index, positions] of outlineRings(countyFeature.geometry).entries()) {
           dataSource.entities.add({
+            id: `${WARD_ENTITY_PREFIX}county-021-casing-${index}`,
+            polyline: {
+              positions,
+              width: LINE.countyCasing,
+              clampToGround: true,
+              material: new Cesium.ColorMaterialProperty(CASING_COLOR),
+            },
+          });
+          dataSource.entities.add({
             id: `${WARD_ENTITY_PREFIX}county-021-ring-${index}`,
             polyline: {
               positions,
-              width: 1.6,
+              width: LINE.countyCore,
               clampToGround: true,
-              material: new Cesium.PolylineGlowMaterialProperty({
-                glowPower: 0.12,
-                color: Cesium.Color.fromCssColorString(ACCENT).withAlpha(0.42),
-              }),
+              material: new Cesium.ColorMaterialProperty(
+                Cesium.Color.fromCssColorString(ACCENT).withAlpha(0.85),
+              ),
             },
           });
         }
@@ -325,16 +360,35 @@ export function createWardLayer(ctx) {
         }
 
         for (const [index, positions] of outlineRings(feature.geometry).entries()) {
+          // Casing first so the core always draws over it.
+          const casing = dataSource.entities.add({
+            id: `${WARD_ENTITY_PREFIX}${properties.code}-casing-${index}`,
+            polyline: {
+              positions,
+              width: LINE.wardCasing,
+              clampToGround: true,
+              material: new Cesium.ColorMaterialProperty(CASING_COLOR),
+            },
+            properties: {
+              wardCode: properties.code,
+              wardName: properties.name,
+              approximate,
+            },
+          });
+          casing.__kilimoAccent = accent;
+          casing[CASING_FLAG] = true;
+
           const entity = dataSource.entities.add({
             id: `${WARD_ENTITY_PREFIX}${properties.code}-outline-${index}`,
             polyline: {
               positions,
-              width: 2.5,
+              width: LINE.wardCore,
               clampToGround: true,
-              material: new Cesium.PolylineGlowMaterialProperty({
-                glowPower: approximate ? 0.1 : 0.18,
-                color: color.withAlpha(approximate ? 0.5 : 0.7),
-              }),
+              // Solid, not glow: an opaque core stays crisp over imagery where
+              // a glow just smears the edge into the hillside behind it.
+              material: new Cesium.ColorMaterialProperty(
+                color.withAlpha(approximate ? 0.8 : 0.98),
+              ),
             },
             properties: {
               wardCode: properties.code,
@@ -356,7 +410,8 @@ export function createWardLayer(ctx) {
         layerId: 'wards',
         prefix: WARD_ENTITY_PREFIX,
         onSelect: (suffix) => {
-          // Entity ids are `<code>-<index>` / `<code>-outline-<index>`.
+          // Ids: `<code>-<index>`, `<code>-outline-<index>`, `<code>-casing-<index>`.
+          // Ward codes are numeric, so the first dash-segment is always the code.
           const code = suffix.split('-')[0];
           selectWard(wardFeatures.some((f) => f.properties?.code === code) ? code : '');
         },

@@ -174,11 +174,11 @@ Invoke-RestMethod http://localhost:8787/api/evaluate -Method Post `
 
 ```mermaid
 graph LR
-    T0["<b>Tier 0 — zero keys</b><br/>Globe · 5 layers · engine<br/>result card · bundled data"]
-    T1["<b>+ ANTHROPIC_API_KEY</b><br/>Claude chat<br/>tool use · citations"]
-    T2["<b>+ GOOGLE_MAPS_API_KEY</b><br/><i>or</i> CESIUM_ION_TOKEN<br/>Photorealistic 3D basemap"]
-    T3["<b>+ ELEVENLABS_*</b><br/>Voice agent<br/>same tool layer"]
-    T4["<b>+ SUPABASE_*</b><br/>Live database<br/>the platform story"]
+    T0["Tier 0 — zero keys<br/>Globe · 5 layers · engine<br/>result card · bundled data"]
+    T1["+ ANTHROPIC_API_KEY<br/>Claude chat<br/>tool use · citations"]
+    T2["+ GOOGLE_MAPS_API_KEY<br/>or CESIUM_ION_TOKEN<br/>Photorealistic 3D basemap"]
+    T3["+ ELEVENLABS_*<br/>Voice agent<br/>same tool layer"]
+    T4["+ SUPABASE_*<br/>Live database<br/>the platform story"]
 
     T0 --> T1 --> T2 --> T3 --> T4
 
@@ -246,10 +246,10 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     Q["🗣️ Farmer question"] --> BRAIN{"Which brain?"}
-    BRAIN -->|typed| CHAT["💬 Claude chat<br/><code>POST /api/chat</code>"]
+    BRAIN -->|typed| CHAT["💬 Claude chat<br/>POST /api/chat"]
     BRAIN -->|spoken| VOICE["🎙️ ElevenLabs agent<br/>signed URL"]
 
-    CHAT --> REG["🧰 <b>ONE tool registry</b><br/><code>kilimo-tools.ts</code><br/>8 tools · 3 UI · 5 data"]
+    CHAT --> REG["🧰 ONE tool registry<br/>kilimo-tools.ts<br/>8 tools · 3 UI · 5 data"]
     VOICE --> REG
 
     REG --> UI["🖥️ UI tools<br/>browser"]
@@ -264,8 +264,8 @@ flowchart TD
     SB --> ENG
     JSON --> ENG
 
-    ENG["⚖️ <b>evaluateFarmer()</b><br/>pure · deterministic · tested"]
-    ENG --> DEC["🪪 <b>Decision</b><br/>conclusion · trace · citations · sijui"]
+    ENG["⚖️ evaluateFarmer()<br/>pure · deterministic · tested"]
+    ENG --> DEC["🪪 Decision<br/>conclusion · trace · citations · sijui"]
     DEC --> MAP
 
     style ENG fill:#0a0a0f,stroke:#34d17b,stroke-width:4px,color:#e8eaed
@@ -285,17 +285,17 @@ Most systems collapse provenance into one word — *live*, *verified*, *official
 flowchart LR
     subgraph AX["Every fact carries three independent axes"]
         direction TB
-        A["<b>AUTHORITY</b><br/>who says so?<br/>official · reported"]
-        B["<b>DERIVATION</b><br/>how was it obtained?<br/>direct · calculated<br/>inferred · simulated"]
-        C["<b>FRESHNESS</b><br/>as of when?<br/>timestamp · current<br/>stale · unknown"]
+        A["AUTHORITY<br/>who says so?<br/>official · reported"]
+        B["DERIVATION<br/>how was it obtained?<br/>direct · calculated<br/>inferred · simulated"]
+        C["FRESHNESS<br/>as of when?<br/>timestamp · current<br/>stale · unknown"]
     end
     AX ==> OUT
 
     subgraph OUT["→ which roll up to ONE operational conclusion"]
         direction TB
-        O1["✅ <b>Confirmed</b><br/>act on this"]
-        O2["📋 <b>Indicated by published rules</b><br/>the rules say yes,<br/>an operational fact is unverified"]
-        O3["🤷🏾 <b>Cannot determine</b><br/>an eligibility input is unknown"]
+        O1["✅ Confirmed<br/>act on this"]
+        O2["📋 Indicated by published rules<br/>the rules say yes,<br/>an operational fact is unverified"]
+        O3["🤷🏾 Cannot determine<br/>an eligibility input is unknown"]
     end
 
     style A fill:#0a0a0f,stroke:#34d17b,color:#e8eaed
@@ -332,13 +332,13 @@ evaluateFarmer({ farmer, programme, prices, depots, now }): Decision
 
 ```mermaid
 flowchart TD
-    S["evaluateFarmer()"] --> L1{"Any <b>eligibility</b> criterion<br/>result = unknown?"}
-    L1 -->|yes| R3["🤷🏾 <b>cannot_determine</b><br/>eligible = null"]
+    S["evaluateFarmer()"] --> L1{"Any eligibility criterion<br/>result = unknown?"}
+    L1 -->|yes| R3["🤷🏾 cannot_determine<br/>eligible = null"]
     L1 -->|no| L2{"Any eligibility<br/>criterion failed?"}
-    L2 -->|yes| R2["✅ <b>confirmed</b> · eligible = false<br/>missingRequirement = first failure<br/><i>a confirmed negative is still confirmed</i>"]
+    L2 -->|yes| R2["✅ confirmed · eligible = false<br/>missingRequirement = first failure<br/>a confirmed negative is still confirmed"]
     L2 -->|no| L3{"Depot stock<br/>unknown / unverified?"}
-    L3 -->|yes| R1["📋 <b>indicated_by_published_rules</b><br/>eligible = true · <b>sijui</b> set"]
-    L3 -->|no| R0["✅ <b>confirmed</b><br/>eligible = true · allocation + price + depot"]
+    L3 -->|yes| R1["📋 indicated_by_published_rules<br/>eligible = true · sijui set"]
+    L3 -->|no| R0["✅ confirmed<br/>eligible = true · allocation + price + depot"]
 
     style R0 fill:#0a0a0f,stroke:#34d17b,stroke-width:3px,color:#e8eaed
     style R1 fill:#0a0a0f,stroke:#f5b942,stroke-width:3px,color:#e8eaed
