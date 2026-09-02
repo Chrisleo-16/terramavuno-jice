@@ -561,9 +561,43 @@ body.cockpit-mode #cockpit-cloud-effects.active {
   top: 32px;
   right: 36px;
   z-index: 100;
-  pointer-events: none;
+  /* Clickable: this is the one view control people actually look at, so it
+     cycles the seven post-processing views. The full picker is still behind
+     VISUAL PRESETS, and keys 1-7 still jump straight to one. */
+  pointer-events: auto;
   user-select: none;
   text-align: right;
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+#style-indicator:hover,
+#style-indicator:focus-visible {
+  border-color: var(--glass-border);
+  background: rgba(255, 255, 255, 0.04);
+}
+#style-indicator:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+#style-indicator .indicator-hint {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+#style-indicator:hover .indicator-hint,
+#style-indicator:focus-visible .indicator-hint {
+  opacity: 0.75;
 }
 
 #style-indicator .indicator-label {
@@ -9560,6 +9594,178 @@ body.scene-playback-mode #key-setup {
 }
 #kilimo-chat-panel:empty {
   display: none;
+}
+
+/* ── Chat panel internals ──────────────────────
+   These were inline styles on the JS-built markup, which made the panel
+   impossible to tune and left the composer clipping its own placeholder. */
+.kilimo-chat-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--glass-border);
+  flex: none;
+}
+.kilimo-chat-brand {
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.kilimo-chat-state {
+  margin-left: auto;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.kilimo-chat-log {
+  flex: 1;
+  min-height: 110px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+/* A hairline scrollbar: the default Windows one is 17px of grey that wrecks
+   the glass panel and visually crowds the message text. */
+.kilimo-chat-log {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+.kilimo-chat-log::-webkit-scrollbar {
+  width: 6px;
+}
+.kilimo-chat-log::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+}
+.kilimo-chat-log::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.kilimo-chat-tool {
+  padding: 0 14px 8px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--accent-alt);
+}
+
+.kilimo-chat-suggestions {
+  padding: 0 14px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: none;
+}
+.kilimo-chat-chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+}
+.kilimo-chat-chip:hover,
+.kilimo-chat-chip:focus-visible {
+  border-color: rgba(52, 209, 123, 0.45);
+  background: rgba(52, 209, 123, 0.1);
+  color: var(--accent);
+}
+
+.kilimo-chat-form {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--glass-border);
+  flex: none;
+}
+.kilimo-chat-sronly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.kilimo-chat-input {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  /* Two lines of headroom. At one row the placeholder wrapped, which both
+     clipped the text and summoned a scrollbar inside a 32px-tall box. */
+  min-height: 38px;
+  max-height: 96px;
+  /* JS grows the box to fit; the bar only appears past max-height. */
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 9px 11px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+.kilimo-chat-input::-webkit-scrollbar {
+  width: 0;
+}
+.kilimo-chat-input::placeholder {
+  color: var(--text-dim);
+  /* One line, clipped with an ellipsis rather than wrapping out of view. */
+  text-overflow: ellipsis;
+}
+.kilimo-chat-input:focus {
+  outline: none;
+  border-color: rgba(52, 209, 123, 0.5);
+  background: rgba(255, 255, 255, 0.07);
+}
+.kilimo-chat-send {
+  flex: none;
+  align-self: stretch;
+  padding: 0 15px;
+  min-height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(52, 209, 123, 0.45);
+  background: rgba(52, 209, 123, 0.14);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+.kilimo-chat-send:hover:not(:disabled) {
+  background: rgba(52, 209, 123, 0.24);
+  border-color: rgba(52, 209, 123, 0.7);
+}
+.kilimo-chat-send:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Narrow viewports: the fixed 360px panel used to overhang the screen edge. */
+@media (max-width: 760px) {
+  #kilimo-chat-panel {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    bottom: 88px;
+    max-height: 52vh;
+  }
 }
 
 /* ── Result card mount (#kilimo-result-card) ───

@@ -339,6 +339,36 @@ export function loadWardFeatures() {
  * Fetch the Murang'a county outline feature.
  * @returns {Promise<object|null>}
  */
+/** @type {Promise<object[]>|null} */
+let _allCountiesPromise = null;
+
+/**
+ * Every Kenyan county boundary (all 47), for the national view.
+ *
+ * `loadCountyFeature` deliberately returns only Murang'a, which is why the
+ * globe showed a bare basemap at country zoom: the geometry for the other 46
+ * was sitting in the same file, unread.
+ *
+ * @returns {Promise<object[]>} GeoJSON features; empty array on failure, since
+ *   a missing national outline must degrade to "no borders", never to a crash.
+ */
+export function loadAllCountyFeatures() {
+  if (!_allCountiesPromise) {
+    _allCountiesPromise = fetch(countiesGeojsonUrl)
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then((collection) => (Array.isArray(collection?.features) ? collection.features : []))
+      .catch((error) => {
+        _allCountiesPromise = null;
+        console.warn('[Kilimo] national county boundaries unavailable:', error?.message ?? error);
+        return [];
+      });
+  }
+  return _allCountiesPromise;
+}
+
 export function loadCountyFeature() {
   if (!_countyFeaturePromise) {
     _countyFeaturePromise = fetch(countiesGeojsonUrl)

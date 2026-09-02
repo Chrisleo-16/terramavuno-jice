@@ -30,10 +30,13 @@
   </div>
 
   <!-- Style indicator -->
-  <div id="style-indicator">
+  <button id="style-indicator" type="button"
+    aria-label="Cycle map view. Shift-click or press 1-7 to pick one directly."
+    title="Click to cycle views (Normal, CRT, NVG, FLIR, Anime, Noir, Snow) - or press 1-7">
     <span class="indicator-label">ACTIVE STYLE</span>
     <span class="indicator-value" id="active-style-name">NORMAL</span>
-  </div>
+    <span class="indicator-hint" aria-hidden="true">CLICK TO CYCLE</span>
+  </button>
 
   <!-- Top-center camera actions -->
   <nav id="top-center-actions" aria-label="Globe actions">

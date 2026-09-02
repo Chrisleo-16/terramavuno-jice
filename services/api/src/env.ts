@@ -88,7 +88,10 @@ export const env = {
   },
   /** Model id for the chat loop; overridable without a code change. */
   get anthropicModel(): string {
-    return val('ANTHROPIC_MODEL') ?? 'claude-sonnet-5';
+    // Haiku 4.5: the farmer chat is narration over a deterministic engine, not
+    // reasoning, so the cheapest fast model is the right default ($1/$5 per MTok
+    // vs Sonnet 5's $2/$10). Override with ANTHROPIC_MODEL.
+    return val('ANTHROPIC_MODEL') ?? 'claude-haiku-4-5';
   },
 
   /** Supabase — server-side reads use the SECRET (service-role) key only. */

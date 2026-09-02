@@ -57,26 +57,23 @@ export function mountChatPanel({ chatClient, showResultCard } = {}) {
   let lastToken = 'K-001';
 
   mount.innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--glass-border);flex:none;">
-      <span style="font-size:10px;letter-spacing:0.22em;color:var(--accent);">Nielekeze by TerraMavuno</span>
-      <span data-chat="state" role="status" aria-live="polite" style="margin-left:auto;font-size:9px;letter-spacing:0.14em;color:var(--text-dim);"></span>
+    <div class="kilimo-chat-head">
+      <span class="kilimo-chat-brand">Nielekeze by TerraMavuno</span>
+      <span class="kilimo-chat-state" data-chat="state" role="status" aria-live="polite"></span>
     </div>
 
-    <div data-chat="log" role="log" aria-live="polite" aria-label="Conversation"
-      tabindex="0"
-      style="flex:1;min-height:120px;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;font-size:12px;line-height:1.5;"></div>
+    <div class="kilimo-chat-log" data-chat="log" role="log" aria-live="polite"
+      aria-label="Conversation" tabindex="0"></div>
 
-    <div data-chat="tool" hidden aria-live="polite"
-      style="padding:0 14px 8px;font-size:10px;letter-spacing:0.08em;color:var(--accent-alt);"></div>
+    <div class="kilimo-chat-tool" data-chat="tool" hidden aria-live="polite"></div>
 
-    <div style="padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px;flex:none;" data-chat="suggestions"></div>
+    <div class="kilimo-chat-suggestions" data-chat="suggestions"></div>
 
-    <form data-chat="form" style="display:flex;gap:8px;align-items:flex-end;padding:10px 14px 12px;border-top:1px solid var(--glass-border);flex:none;">
-      <label for="kilimo-chat-input" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Ask the Nielekeze assistant</label>
-      <textarea id="kilimo-chat-input" data-chat="input" rows="1" placeholder="Uliza… e.g. Nina mbolea ya ruzuku?"
-        style="flex:1;resize:none;max-height:88px;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:10px;padding:8px 10px;color:var(--text-primary);font-family:var(--font-mono);font-size:12px;"></textarea>
-      <button type="submit" data-chat="send"
-        style="padding:8px 14px;border-radius:999px;border:1px solid rgba(52,209,123,0.45);background:rgba(52,209,123,0.12);color:var(--accent);font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;cursor:pointer;">SEND</button>
+    <form class="kilimo-chat-form" data-chat="form">
+      <label class="kilimo-chat-sronly" for="kilimo-chat-input">Ask the Nielekeze assistant</label>
+      <textarea class="kilimo-chat-input" id="kilimo-chat-input" data-chat="input" rows="1"
+        placeholder="Uliza… e.g. Nina mbolea?"></textarea>
+      <button class="kilimo-chat-send" type="submit" data-chat="send">SEND</button>
     </form>
   `;
 
@@ -231,8 +228,7 @@ export function mountChatPanel({ chatClient, showResultCard } = {}) {
     button.type = 'button';
     button.textContent = prompt.label;
     button.title = prompt.text;
-    button.style.cssText =
-      'padding:5px 10px;border-radius:999px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.04);color:var(--text-secondary);font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.08em;cursor:pointer;';
+    button.className = 'kilimo-chat-chip';
     button.addEventListener('click', () => {
       void ask(prompt.text, { forceToken: prompt.token });
     });
@@ -253,7 +249,7 @@ export function mountChatPanel({ chatClient, showResultCard } = {}) {
   input?.addEventListener('keypress', (event) => event.stopPropagation());
   input?.addEventListener('input', () => {
     input.style.height = 'auto';
-    input.style.height = `${Math.min(88, input.scrollHeight)}px`;
+    input.style.height = `${Math.min(96, input.scrollHeight)}px`; // matches .kilimo-chat-input max-height
   });
 
   const onSubmit = (event) => {

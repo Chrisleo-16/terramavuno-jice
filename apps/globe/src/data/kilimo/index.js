@@ -1,6 +1,6 @@
 /**
  * @module data/kilimo
- * @description Registration entry point for the five Kenya evidence layers.
+ * @description Registration entry point for the Kenya evidence layers.
  *
  * THE CALL THE APP MAKES (from main.js's boot, or from any later agent that
  * holds `window.__KILIMO__`):
@@ -18,7 +18,7 @@
  * LAYER IDS — exactly the ids the `set_layer_visibility` tool schema in
  * `packages/shared/src/tools/kilimo-tools.ts` enumerates:
  *
- *   'wards' | 'programme' | 'prices' | 'depots' | 'farmers'
+ *   'counties' | 'wards' | 'programme' | 'prices' | 'depots' | 'farmers'
  *
  * The GEV-era aliases (`kilimo-wards`, …) are ALSO written into the registry
  * as pointers to the same layer objects, so scene recipes or modules that were
@@ -60,16 +60,20 @@ import {
   checkKilimoDataConsistency,
 } from './kilimoData.js';
 import { createWardLayer, normalizePlace } from './wardLayer.js';
+import { createCountiesLayer } from './countiesLayer.js';
 import { createDepotLayer } from './depotLayer.js';
 import { createProgrammeLayer } from './programmeLayer.js';
 import { createPriceLayer } from './priceLayer.js';
 import { createFarmerLayer } from './farmerLayer.js';
 
 /** The canonical layer ids, in panel order. Public contract. */
-export const KILIMO_LAYER_IDS = Object.freeze(['wards', 'programme', 'prices', 'depots', 'farmers']);
+export const KILIMO_LAYER_IDS = Object.freeze([
+  'counties', 'wards', 'programme', 'prices', 'depots', 'farmers',
+]);
 
 /** Legacy `kilimo-*` aliases kept resolvable in the registry. */
 export const KILIMO_LAYER_ID_ALIASES = Object.freeze({
+  'kilimo-counties': 'counties',
   'kilimo-wards': 'wards',
   'kilimo-programme': 'programme',
   'kilimo-prices': 'prices',
@@ -210,7 +214,7 @@ export function listResolvableTargets() {
 }
 
 /**
- * Register the five Kenya evidence layers.
+ * Register the Kenya evidence layers.
  *
  * @param {object} options
  * @param {Cesium.Viewer} options.viewer The Cesium viewer.
@@ -234,7 +238,7 @@ export function registerKilimoLayers({
   dataManager = null,
   registerLayer = null,
   styleManager = null,
-  initialVisible = ['wards'],
+  initialVisible = ['counties', 'wards'],
 } = {}) {
   if (!viewer) throw new TypeError('registerKilimoLayers requires a Cesium viewer');
   const registry = layerRegistry instanceof Map ? layerRegistry : new Map();
@@ -309,6 +313,7 @@ export function registerKilimoLayers({
   const ctx = { viewer, focusTarget, setLayerEnabled, requestRender: governorRequestRender };
 
   const layers = [
+    createCountiesLayer(ctx),
     createWardLayer(ctx),
     createProgrammeLayer(ctx),
     createPriceLayer(ctx),

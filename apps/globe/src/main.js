@@ -354,7 +354,9 @@ async function init() {
       dataManager,
       registerLayer,
       styleManager,
-      initialVisible: ['wards'],
+      // Counties first: the opening shot frames the whole country, and without
+      // this Kenya has no borders at all until the camera reaches Murang'a.
+      initialVisible: ['counties', 'wards'],
     });
 
     // Interaction layer: the action runner, Claude chat panel, farmer result

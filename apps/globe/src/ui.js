@@ -60,6 +60,9 @@ const STYLES = {
 /** Compact display names for the ACTIVE STYLE indicator. */
 const STYLE_DISPLAY_NAMES = { surveillance: 'NVG', thermal: 'FLIR', retro: 'CRT' };
 
+/** Click-to-cycle order for the ACTIVE STYLE toggle; matches hotkeys 1-7. */
+const STYLE_CYCLE = ['normal', 'retro', 'surveillance', 'thermal', 'anime', 'noir', 'snow'];
+
 /**
  * Kenya location pills for the LOCATION tray. The Kandara-area wards are where
  * the P0 farmer journey lives; Nairobi is the cinematic intro beat.
@@ -271,6 +274,27 @@ export class StyleManager {
   _wireStyleButtons() {
     document.querySelectorAll('.style-btn').forEach((btn) => {
       btn.addEventListener('click', () => this.setStyle(btn.dataset.style));
+    });
+    this._wireStyleCycle();
+  }
+
+  /**
+   * The ACTIVE STYLE readout doubles as the view toggle.
+   *
+   * The seven views were only reachable through the collapsed VISUAL PRESETS
+   * tray or an undocumented 1-7 hotkey, so in practice nobody found them.
+   * Clicking the readout advances one view; shift-click steps back.
+   */
+  _wireStyleCycle() {
+    const indicator = document.getElementById('style-indicator');
+    if (!(indicator instanceof HTMLElement)) return;
+    indicator.addEventListener('click', (event) => {
+      const order = STYLE_CYCLE;
+      const current = order.indexOf(this.activeStyle);
+      const step = event.shiftKey ? -1 : 1;
+      // `+ order.length` keeps the modulo positive when stepping back from 0.
+      const next = order[(current + step + order.length) % order.length];
+      this.setStyle(next);
     });
   }
 

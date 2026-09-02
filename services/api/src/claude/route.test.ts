@@ -12,6 +12,7 @@ import {
   buildRequestParams,
   readToolUse,
   resolveToolUse,
+  supportsEffort,
   type ChatSseEvent,
 } from './route.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
@@ -152,5 +153,21 @@ describe('system prompt honesty invariants', () => {
 
   it('contains no timestamp or id that would invalidate the cache prefix', () => {
     expect(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/.test(SYSTEM_PROMPT)).toBe(false);
+  });
+});
+
+describe('effort is only sent to models that accept it', () => {
+  it('omits output_config.effort for Haiku 4.5, which 400s on it', () => {
+    const params = buildRequestParams([], 'claude-haiku-4-5');
+    expect(params.output_config).toBeUndefined();
+    expect(supportsEffort('claude-haiku-4-5')).toBe(false);
+    expect(supportsEffort('claude-sonnet-4-5')).toBe(false);
+  });
+
+  it('sends it for the 5 family', () => {
+    expect((buildRequestParams([], 'claude-sonnet-5').output_config as { effort: string }).effort)
+      .toBe('low');
+    expect(supportsEffort('claude-opus-5')).toBe(true);
+    expect(supportsEffort('claude-sonnet-5')).toBe(true);
   });
 });

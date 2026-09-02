@@ -156,6 +156,21 @@ export async function resolveToolUse(
  * system text contains no timestamps or ids, so the prefix is byte-stable
  * across requests and turns.
  */
+/**
+ * `output_config.effort` is a 5-family parameter. Haiku 4.5 and the other 4.5
+ * models REJECT it with a 400 rather than ignoring it, so it cannot be sent
+ * unconditionally — the chat model is operator-configurable via
+ * ANTHROPIC_MODEL, and a wrong default would break chat entirely.
+ *
+ * @param model Model id from configuration.
+ * @returns True when the model accepts `output_config.effort`.
+ */
+export function supportsEffort(model: string): boolean {
+  // Everything in the Opus/Sonnet/Fable 5 families and Opus 4.6+ takes effort.
+  // The 4.5 generation (haiku-4-5, sonnet-4-5) does not.
+  return !/-4-5(\b|$)/.test(model);
+}
+
 export function buildRequestParams(
   messages: Anthropic.MessageParam[],
   model: string,
@@ -163,9 +178,9 @@ export function buildRequestParams(
   return {
     model,
     max_tokens: MAX_TOKENS,
-    // Snappy demo turns: low effort, adaptive thinking (the default on
-    // Sonnet 5 / Opus 5). No temperature or top_p — not supported.
-    output_config: { effort: 'low' },
+    // Snappy demo turns: low effort where the model supports it. No
+    // temperature or top_p — not supported on the 5 family.
+    ...(supportsEffort(model) ? { output_config: { effort: 'low' } } : {}),
     tools: toAnthropicTools(),
     system: [
       {
